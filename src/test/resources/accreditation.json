@@ -1,0 +1,43 @@
+{
+    "accreditationId": "accreditationId",
+    "requestor": "requestor",
+    "subject": "subject",
+    "aggregateStatus": {
+        "code": 1,
+        "description": "description",
+        "retryAt": "2020-01-01T00:00:30Z"
+    },
+    "evidenceCodes": [
+        {
+            "evidenceCodeName": "evidenceCodeName",
+            "description": "description",
+            "accessMethod": "open",
+            "values": [
+                {
+                    "evidenceValueName": "evidenceValueName",
+                    "valueType": "string",
+                    "mimeType": "application/json",
+                    "source": "source",
+                    "value": "value",
+                    "timestamp": "2020-01-01T00:00:30Z"
+                }
+            ],
+            "parameters": [
+                {
+                    "evidenceParamName": "evidenceParamName",
+                    "paramType": "string",
+                    "required": true,
+                    "value": "value"
+                }
+            ],
+            "maxValidDays": 2,
+            "isAsynchronous": true
+        }
+    ],
+    "issued": "2020-01-01T00:00:30Z",
+    "lastChanged": "2020-01-01T00:00:30Z",
+    "validTo": "2020-01-01T00:00:30Z",
+    "tedReference": "tedReference",
+    "doffinReference": "doffinReference",
+    "externalReference": "externalReference"
+}

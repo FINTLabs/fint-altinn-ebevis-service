@@ -1,0 +1,25 @@
+{
+    "name": "name",
+    "timestamp": "2020-01-01T00:00:30Z",
+    "evidenceStatus": {
+        "evidenceCodeName": "evidenceCodeName",
+        "status": {
+            "description": "description",
+            "code": 1,
+            "retryAt": "2020-01-01T00:00:30Z"
+        },
+        "validFrom": "2020-01-01T00:00:30Z",
+        "validTo": "2020-01-01T00:00:30Z",
+        "didSupplyLegalBasis": true
+    },
+    "evidenceValues": [
+        {
+            "evidenceValueName": "evidenceValueName",
+            "valueType": "string",
+            "mimeType": "application/json",
+            "source": "source",
+            "value": "value",
+            "timestamp": "2020-01-01T00:00:30Z"
+        }
+    ]
+}

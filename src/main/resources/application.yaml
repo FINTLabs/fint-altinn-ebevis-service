@@ -1,0 +1,4 @@
+altinn:
+  base-url: https://api.ebevis.no/nadobe-staging/v1
+  #base-url: https://api.ebevis.no/nadobe/v1
+  ocp-apim-subscription-key:
