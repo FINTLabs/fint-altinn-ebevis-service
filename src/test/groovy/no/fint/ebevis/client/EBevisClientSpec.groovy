@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import no.fint.ebevis.configuration.AltinnConfiguration
+import no.fint.ebevis.configuration.AltinnProperties
 import no.fint.ebevis.model.ebevis.Accreditation
 import no.fint.ebevis.model.ebevis.Error
 import no.fint.ebevis.model.ebevis.Evidence
@@ -28,12 +28,12 @@ class EBevisClientSpec extends Specification {
 
     MockWebServer mockWebServer = new MockWebServer()
 
-    AltinnConfiguration altinnConfiguration = new AltinnConfiguration(
-            baseUrl: 'http://localhost:' + mockWebServer.getPort(),
-            ocpApimSubscriptionKey: 'key'
-    )
+    AltinnProperties altinnProperties = Stub(AltinnProperties) {
+        getBaseUrl() >> 'http://localhost:' + mockWebServer.getPort()
+        getOcpApimSubscriptionKey() >> 'key'
+    }
 
-    EBevisClient eBevisClient = new EBevisClient(WebClient.builder(), altinnConfiguration)
+    EBevisClient eBevisClient = new EBevisClient(WebClient.builder(), altinnProperties)
 
     void cleanup() {
         mockWebServer.shutdown()
@@ -79,7 +79,7 @@ class EBevisClientSpec extends Specification {
                 .verifyComplete()
     }
 
-    def "get accreditations returns flux"() {
+    def "get accreditations returns mono"() {
         given:
         def file = getClass().getClassLoader().getResource('accreditation.json')
         def accreditation = objectMapper.readValue(file, Accreditation.class)
@@ -94,7 +94,7 @@ class EBevisClientSpec extends Specification {
 
         then:
         StepVerifier.create(setup)
-                .expectNext(accreditation, accreditation)
+                .expectNext([accreditation, accreditation])
                 .verifyComplete()
     }
 
@@ -117,7 +117,7 @@ class EBevisClientSpec extends Specification {
                 .verifyComplete()
     }
 
-    def "get evidence statuses returns flux"() {
+    def "get evidence statuses returns mono"() {
         given:
         def file = getClass().getClassLoader().getResource('evidence.json')
         def evidenceStatus = objectMapper.readValue(file, Evidence.class).evidenceStatus
@@ -132,11 +132,11 @@ class EBevisClientSpec extends Specification {
 
         then:
         StepVerifier.create(setup)
-                .expectNext(evidenceStatus, evidenceStatus)
+                .expectNext([evidenceStatus, evidenceStatus])
                 .verifyComplete()
     }
 
-    def "get error codes returns flux"() {
+    def "get error codes returns mono"() {
         given:
         def errorCode = new Error(code: 1, description: 'description')
 
@@ -150,11 +150,11 @@ class EBevisClientSpec extends Specification {
 
         then:
         StepVerifier.create(setup)
-                .expectNext(errorCode, errorCode)
+                .expectNext([errorCode, errorCode])
                 .verifyComplete()
     }
 
-    def "get evidence codes returns flux"() {
+    def "get evidence codes returns mono"() {
         given:
         def file = getClass().getClassLoader().getResource('accreditation.json')
         def evidenceCode = objectMapper.readValue(file, Accreditation.class).evidenceCodes.first()
@@ -169,11 +169,11 @@ class EBevisClientSpec extends Specification {
 
         then:
         StepVerifier.create(setup)
-                .expectNext(evidenceCode, evidenceCode)
+                .expectNext([evidenceCode, evidenceCode])
                 .verifyComplete()
     }
 
-    def "get status codes returns flux"() {
+    def "get status codes returns mono"() {
         given:
         def file = getClass().getClassLoader().getResource('evidence.json')
         def statusCode = objectMapper.readValue(file, Evidence.class).evidenceStatus.status
@@ -188,7 +188,7 @@ class EBevisClientSpec extends Specification {
 
         then:
         StepVerifier.create(setup)
-                .expectNext(statusCode, statusCode)
+                .expectNext([statusCode, statusCode])
                 .verifyComplete()
     }
 

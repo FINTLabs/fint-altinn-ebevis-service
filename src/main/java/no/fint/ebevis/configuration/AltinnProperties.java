@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
 @ConfigurationProperties("altinn")
-public class AltinnConfiguration {
+public class AltinnProperties {
     private String baseUrl;
     private String ocpApimSubscriptionKey;
 }

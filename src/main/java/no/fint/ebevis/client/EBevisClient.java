@@ -1,28 +1,29 @@
 package no.fint.ebevis.client;
 
-import no.fint.ebevis.configuration.AltinnConfiguration;
+import no.fint.ebevis.configuration.AltinnProperties;
 import no.fint.ebevis.model.ebevis.*;
 import no.fint.ebevis.model.ebevis.Error;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Component
 public class EBevisClient {
     private final WebClient webClient;
 
-    public EBevisClient(WebClient.Builder webClientBuilder, AltinnConfiguration altinnConfiguration) {
+    public EBevisClient(WebClient.Builder webClientBuilder, AltinnProperties altinnProperties) {
         this.webClient = webClientBuilder
                 .defaultHeaders(httpHeaders -> {
-                    httpHeaders.add("Ocp-Apim-Subscription-Key", altinnConfiguration.getOcpApimSubscriptionKey());
+                    httpHeaders.add("Ocp-Apim-Subscription-Key", altinnProperties.getOcpApimSubscriptionKey());
                     httpHeaders.add("X-NADOBE-CERT", "TODO");
                 })
-                .baseUrl(altinnConfiguration.getBaseUrl())
+                .baseUrl(altinnProperties.getBaseUrl())
                 .build();
     }
 
@@ -45,7 +46,7 @@ public class EBevisClient {
     /*
     query parameters - might only be available in staging/test environment
      */
-    public Flux<Accreditation> getAccreditations(String requestor, ZonedDateTime changedAfter, Boolean onlyAvailable) {
+    public Mono<List<Accreditation>> getAccreditations(String requestor, ZonedDateTime changedAfter, Boolean onlyAvailable) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/accreditations")
@@ -54,7 +55,8 @@ public class EBevisClient {
                         .queryParam("onlyavailable", onlyAvailable)
                         .build())
                 .retrieve()
-                .bodyToFlux(Accreditation.class);
+                .bodyToMono(new ParameterizedTypeReference<List<Accreditation>>() {
+                });
     }
 
     public Mono<Evidence> getEvidence(String accreditationId, String evidenceCode) {
@@ -64,31 +66,35 @@ public class EBevisClient {
                 .bodyToMono(Evidence.class);
     }
 
-    public Flux<EvidenceStatus> getEvidenceStatuses(String accreditationId) {
+    public Mono<List<EvidenceStatus>> getEvidenceStatuses(String accreditationId) {
         return webClient.get()
                 .uri("/evidence/{accreditationId}", accreditationId)
                 .retrieve()
-                .bodyToFlux(EvidenceStatus.class);
+                .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatus>>() {
+                });
     }
 
-    public Flux<Error> getErrorCodes() {
+    public Mono<List<Error>> getErrorCodes() {
         return webClient.get()
                 .uri("/public/metadata/errorcodes")
                 .retrieve()
-                .bodyToFlux(Error.class);
+                .bodyToMono(new ParameterizedTypeReference<List<Error>>() {
+                });
     }
 
-    public Flux<EvidenceCode> getEvidenceCodes() {
+    public Mono<List<EvidenceCode>> getEvidenceCodes() {
         return webClient.get()
                 .uri("/public/metadata/evidencecodes")
                 .retrieve()
-                .bodyToFlux(EvidenceCode.class);
+                .bodyToMono(new ParameterizedTypeReference<List<EvidenceCode>>() {
+                });
     }
 
-    public Flux<EvidenceStatusCode> getStatusCodes() {
+    public Mono<List<EvidenceStatusCode>> getStatusCodes() {
         return webClient.get()
                 .uri("/public/metadata/statuscodes")
                 .retrieve()
-                .bodyToFlux(EvidenceStatusCode.class);
+                .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatusCode>>() {
+                });
     }
 }
