@@ -21,19 +21,21 @@ import spock.lang.Specification
 
 import java.time.ZonedDateTime
 
-class EBevisClientSpec extends Specification {
+class DataAltinnClientSpec extends Specification {
     ObjectMapper objectMapper = new ObjectMapper()
             .registerModules(new JavaTimeModule(), new SimpleModule().addSerializer(MediaType.class, new MediaTypeSerializer()))
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     MockWebServer mockWebServer = new MockWebServer()
 
-    AltinnProperties altinnProperties = Stub(AltinnProperties) {
-        getBaseUrl() >> 'http://localhost:' + mockWebServer.getPort()
-        getOcpApimSubscriptionKey() >> 'key'
-    }
+    WebClient webClient
+    DataAltinnClient dataAltinnClient
 
-    EBevisClient eBevisClient = new EBevisClient(WebClient.builder(), altinnProperties)
+    void setup() {
+        mockWebServer.start()
+        webClient = WebClient.builder().baseUrl('http://localhost:' + mockWebServer.getPort()).build()
+        dataAltinnClient = new DataAltinnClient(webClient)
+    }
 
     void cleanup() {
         mockWebServer.shutdown()
@@ -51,7 +53,7 @@ class EBevisClientSpec extends Specification {
                 .setResponseCode(HttpStatus.CREATED.value()))
 
         when:
-        def setup = eBevisClient.createAccreditation(ObjectFactory.newAuthorization())
+        def setup = dataAltinnClient.createAccreditation(ObjectFactory.newAuthorization())
 
         then:
         StepVerifier.create(setup)
@@ -69,7 +71,7 @@ class EBevisClientSpec extends Specification {
                 .setResponseCode(HttpStatus.NO_CONTENT.value()))
 
         when:
-        def setup = eBevisClient.deleteAccreditation(_ as String)
+        def setup = dataAltinnClient.deleteAccreditation(_ as String)
 
         then:
         StepVerifier.create(setup)
@@ -90,7 +92,7 @@ class EBevisClientSpec extends Specification {
                 .setResponseCode(HttpStatus.OK.value()))
 
         when:
-        def setup = eBevisClient.getAccreditations(_ as String, ZonedDateTime.now(), _ as Boolean)
+        def setup = dataAltinnClient.getAccreditations(_ as String, ZonedDateTime.now(), _ as Boolean)
 
         then:
         StepVerifier.create(setup)
@@ -109,7 +111,7 @@ class EBevisClientSpec extends Specification {
                 .setResponseCode(HttpStatus.OK.value()))
 
         when:
-        def setup = eBevisClient.getEvidence(_ as String, _ as String)
+        def setup = dataAltinnClient.getEvidence(_ as String, _ as String)
 
         then:
         StepVerifier.create(setup)
@@ -128,7 +130,7 @@ class EBevisClientSpec extends Specification {
                 .setResponseCode(HttpStatus.OK.value()))
 
         when:
-        def setup = eBevisClient.getEvidenceStatuses(_ as String)
+        def setup = dataAltinnClient.getEvidenceStatuses(_ as String)
 
         then:
         StepVerifier.create(setup)
@@ -146,7 +148,7 @@ class EBevisClientSpec extends Specification {
                 .setResponseCode(HttpStatus.OK.value()))
 
         when:
-        def setup = eBevisClient.getErrorCodes()
+        def setup = dataAltinnClient.getErrorCodes()
 
         then:
         StepVerifier.create(setup)
@@ -165,7 +167,7 @@ class EBevisClientSpec extends Specification {
                 .setResponseCode(HttpStatus.OK.value()))
 
         when:
-        def setup = eBevisClient.getEvidenceCodes()
+        def setup = dataAltinnClient.getEvidenceCodes()
 
         then:
         StepVerifier.create(setup)
@@ -184,13 +186,11 @@ class EBevisClientSpec extends Specification {
                 .setResponseCode(HttpStatus.OK.value()))
 
         when:
-        def setup = eBevisClient.getStatusCodes()
+        def setup = dataAltinnClient.getStatusCodes()
 
         then:
         StepVerifier.create(setup)
                 .expectNext([statusCode, statusCode])
                 .verifyComplete()
     }
-
-
 }

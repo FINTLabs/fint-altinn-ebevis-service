@@ -1,0 +1,3 @@
+altinn:
+  base-url: https://test-api.data.altinn.no/v1
+  ocp-apim-subscription-key: key

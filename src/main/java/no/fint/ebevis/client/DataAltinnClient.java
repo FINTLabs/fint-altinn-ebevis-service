@@ -1,6 +1,5 @@
 package no.fint.ebevis.client;
 
-import no.fint.ebevis.configuration.AltinnProperties;
 import no.fint.ebevis.model.ebevis.*;
 import no.fint.ebevis.model.ebevis.Error;
 import org.springframework.core.ParameterizedTypeReference;
@@ -14,17 +13,11 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 @Component
-public class EBevisClient {
+public class DataAltinnClient {
     private final WebClient webClient;
 
-    public EBevisClient(WebClient.Builder webClientBuilder, AltinnProperties altinnProperties) {
-        this.webClient = webClientBuilder
-                .defaultHeaders(httpHeaders -> {
-                    httpHeaders.add("Ocp-Apim-Subscription-Key", altinnProperties.getOcpApimSubscriptionKey());
-                    httpHeaders.add("X-NADOBE-CERT", "TODO");
-                })
-                .baseUrl(altinnProperties.getBaseUrl())
-                .build();
+    public DataAltinnClient(WebClient webClient) {
+        this.webClient = webClient;
     }
 
     public Mono<ResponseEntity<Accreditation>> createAccreditation(Authorization authorization) {
@@ -43,9 +36,6 @@ public class EBevisClient {
                 .toBodilessEntity();
     }
 
-    /*
-    query parameters - might only be available in staging/test environment
-     */
     public Mono<List<Accreditation>> getAccreditations(String requestor, ZonedDateTime changedAfter, Boolean onlyAvailable) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder

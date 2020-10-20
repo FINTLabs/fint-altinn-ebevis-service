@@ -9,7 +9,8 @@ public enum ValueType {
     ATTACHMENT("attachment"),
     DATETIME("dateTime"),
     URI("uri"),
-    AMOUNT("amount");
+    AMOUNT("amount"),
+    JSON_SCHEMA("jsonSchema");
 
     private final String value;
 

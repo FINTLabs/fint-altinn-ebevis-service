@@ -30,6 +30,9 @@ public class EvidenceValue {
     @JsonProperty("timestamp")
     private ZonedDateTime timestamp;
 
+    @JsonProperty("jsonSchemaDefintion")
+    private String jsonSchemaDefinition;
+
     public EvidenceValue(String evidenceValueName, ValueType valueType, String source) {
         this.evidenceValueName = evidenceValueName;
         this.valueType = valueType;

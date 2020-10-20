@@ -33,6 +33,9 @@ public class EvidenceCode {
     @JsonProperty("values")
     private List<EvidenceValue> values;
 
+    @JsonProperty("serviceContext")
+    private String serviceContext;
+
     public EvidenceCode(String evidenceCodeName, AccessMethod accessMethod, Boolean isAsynchronous, List<EvidenceValue> values) {
         this.evidenceCodeName = evidenceCodeName;
         this.accessMethod = accessMethod;
