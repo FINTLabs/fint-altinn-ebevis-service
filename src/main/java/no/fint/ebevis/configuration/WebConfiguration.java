@@ -1,5 +1,6 @@
 package no.fint.ebevis.configuration;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
@@ -14,6 +15,7 @@ public class WebConfiguration {
         return objectMapper -> {
             objectMapper.modulesToInstall(new JavaTimeModule());
             objectMapper.failOnUnknownProperties(false);
+            objectMapper.serializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         };
     }
