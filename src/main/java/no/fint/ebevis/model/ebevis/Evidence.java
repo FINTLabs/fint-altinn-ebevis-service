@@ -1,5 +1,6 @@
 package no.fint.ebevis.model.ebevis;
 
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,19 +18,12 @@ public class Evidence {
     private String name;
 
     @JsonSetter("timestamp")
-    private ZonedDateTime timestamp;
+    private OffsetDateTime timestamp;
 
     @JsonProperty("evidenceStatus")
     private EvidenceStatus evidenceStatus;
 
     @JsonProperty("evidenceValues")
     private List<EvidenceValue> evidenceValues;
-
-    public Evidence(String name, ZonedDateTime timestamp, EvidenceStatus evidenceStatus, List<EvidenceValue> evidenceValues) {
-        this.name = name;
-        this.timestamp = timestamp;
-        this.evidenceStatus = evidenceStatus;
-        this.evidenceValues = evidenceValues;
-    }
 }
 

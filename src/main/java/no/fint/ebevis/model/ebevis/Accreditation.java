@@ -1,5 +1,6 @@
 package no.fint.ebevis.model.ebevis;
 
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,8 +12,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class Accreditation {
-    @JsonProperty("accreditationId")
-    private String accreditationId;
+    @JsonProperty("id")
+    private String id;
 
     @JsonProperty("requestor")
     private String requestor;
@@ -27,28 +28,21 @@ public class Accreditation {
     private List<EvidenceCode> evidenceCodes;
 
     @JsonProperty("issued")
-    private ZonedDateTime issued;
+    private OffsetDateTime issued;
 
     @JsonProperty("lastChanged")
-    private ZonedDateTime lastChanged;
+    private OffsetDateTime lastChanged;
 
     @JsonProperty("validTo")
-    private ZonedDateTime validTo;
+    private OffsetDateTime validTo;
 
-    @JsonProperty("tedReference")
-    private String tedReference;
-
-    @JsonProperty("doffinReference")
-    private String doffinReference;
+    @JsonProperty("consentReference")
+    private String consentReference;
 
     @JsonProperty("externalReference")
     private String externalReference;
 
-    public Accreditation(String accreditationId, String subject, ZonedDateTime issued, ZonedDateTime validTo) {
-        this.accreditationId = accreditationId;
-        this.subject = subject;
-        this.issued = issued;
-        this.validTo = validTo;
-    }
+    @JsonProperty("languageCode")
+    private String languageCode;
 }
 

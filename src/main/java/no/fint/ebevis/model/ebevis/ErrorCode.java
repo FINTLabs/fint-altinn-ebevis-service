@@ -6,15 +6,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Error {
+public class ErrorCode {
     @JsonProperty("code")
     private Integer code;
 
     @JsonProperty("description")
     private String description;
-
-    public Error(Integer code) {
-        this.code = code;
-    }
 }
 

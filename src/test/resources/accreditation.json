@@ -1,5 +1,5 @@
 {
-    "accreditationId": "accreditationId",
+    "id": "id",
     "requestor": "requestor",
     "subject": "subject",
     "aggregateStatus": {
@@ -37,7 +37,7 @@
     "issued": "2020-01-01T00:00:30Z",
     "lastChanged": "2020-01-01T00:00:30Z",
     "validTo": "2020-01-01T00:00:30Z",
-    "tedReference": "tedReference",
-    "doffinReference": "doffinReference",
-    "externalReference": "externalReference"
+    "consentReference": "consentReference",
+    "externalReference": "externalReference",
+    "languageCode": "no-nb"
 }

@@ -1,6 +1,6 @@
 {
-    "requestor": "requestor",
-    "subject": "subject",
+    "requestor": 123,
+    "subject": 456,
     "evidenceRequests": [
         {
             "evidenceCodeName": "evidenceCodeName",
@@ -24,8 +24,7 @@
             "content": "content"
         }
     ],
-    "tedReference": "tedReference",
-    "doffinReference": "doffinReference",
+    "consentReference": "consentReference",
     "externalReference": "externalReference",
     "validTo": "2020-01-01T00:00:00Z"
 }

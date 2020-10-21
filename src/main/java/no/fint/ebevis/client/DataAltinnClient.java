@@ -1,7 +1,6 @@
 package no.fint.ebevis.client;
 
 import no.fint.ebevis.model.ebevis.*;
-import no.fint.ebevis.model.ebevis.Error;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -61,30 +60,6 @@ public class DataAltinnClient {
                 .uri("/evidence/{accreditationId}", accreditationId)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatus>>() {
-                });
-    }
-
-    public Mono<List<Error>> getErrorCodes() {
-        return webClient.get()
-                .uri("/public/metadata/errorcodes")
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Error>>() {
-                });
-    }
-
-    public Mono<List<EvidenceCode>> getEvidenceCodes() {
-        return webClient.get()
-                .uri("/public/metadata/evidencecodes")
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<EvidenceCode>>() {
-                });
-    }
-
-    public Mono<List<EvidenceStatusCode>> getStatusCodes() {
-        return webClient.get()
-                .uri("/public/metadata/statuscodes")
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatusCode>>() {
                 });
     }
 }

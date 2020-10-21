@@ -1,5 +1,6 @@
 package no.fint.ebevis.model.ebevis;
 
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,20 +18,12 @@ public class EvidenceStatus {
     private EvidenceStatusCode status;
 
     @JsonProperty("validFrom")
-    private ZonedDateTime validFrom;
+    private OffsetDateTime validFrom;
 
     @JsonProperty("validTo")
-    private ZonedDateTime validTo;
+    private OffsetDateTime validTo;
 
     @JsonProperty("didSupplyLegalBasis")
     private Boolean didSupplyLegalBasis;
-
-    public EvidenceStatus(String evidenceCodeName, EvidenceStatusCode status, ZonedDateTime validFrom, ZonedDateTime validTo, Boolean didSupplyLegalBasis) {
-        this.evidenceCodeName = evidenceCodeName;
-        this.status = status;
-        this.validFrom = validFrom;
-        this.validTo = validTo;
-        this.didSupplyLegalBasis = didSupplyLegalBasis;
-    }
 }
 

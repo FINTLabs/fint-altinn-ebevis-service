@@ -19,9 +19,5 @@ public class EvidenceParameter {
 
     @JsonProperty("value")
     private Object value;
-
-    public EvidenceParameter(String evidenceParamName) {
-        this.evidenceParamName = evidenceParamName;
-    }
 }
 

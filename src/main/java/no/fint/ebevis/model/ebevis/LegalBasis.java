@@ -16,11 +16,5 @@ public class LegalBasis {
 
     @JsonProperty("content")
     private String content;
-
-    public LegalBasis(String id, Type type, String content) {
-        this.id = id;
-        this.type = type;
-        this.content = content;
-    }
 }
 

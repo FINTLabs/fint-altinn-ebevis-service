@@ -7,14 +7,15 @@ import no.fint.ebevis.model.ebevis.LegalBasis
 import no.fint.ebevis.model.ebevis.vocab.ParamType
 import no.fint.ebevis.model.ebevis.vocab.Type
 
+import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 
 class ObjectFactory {
 
     static Authorization newAuthorization() {
         return new Authorization(
-                requestor: 'requestor',
-                subject: 'subject',
+                requestor: 123,
+                subject: 456,
                 evidenceRequests: [
                         new EvidenceRequest(
                                 evidenceCodeName: 'evidenceCodeName',
@@ -38,10 +39,9 @@ class ObjectFactory {
                                 content: 'content'
                         )
                 ],
-                tedReference: 'tedReference',
-                doffinReference: 'doffinReference',
                 externalReference: 'externalReference',
-                validTo: ZonedDateTime.parse('2020-01-01T00:00:00Z')
+                consentReference: 'consentReference',
+                validTo: OffsetDateTime.parse('2020-01-01T00:00:00Z')
         )
     }
 }

@@ -1,5 +1,6 @@
 package no.fint.ebevis.model.ebevis;
 
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,10 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Authorization {
     @JsonProperty("requestor")
-    private String requestor;
+    private Integer requestor;
 
     @JsonProperty("subject")
-    private String subject;
+    private Integer subject;
 
     @JsonProperty("evidenceRequests")
     private List<EvidenceRequest> evidenceRequests;
@@ -24,16 +25,12 @@ public class Authorization {
     @JsonProperty("legalBasisList")
     private List<LegalBasis> legalBasisList;
 
-    @JsonProperty("tedReference")
-    private String tedReference;
-
-    @JsonProperty("doffinReference")
-    private String doffinReference;
+    @JsonProperty("consentReference")
+    private String consentReference;
 
     @JsonProperty("externalReference")
     private String externalReference;
 
     @JsonProperty("validTo")
-    private ZonedDateTime validTo;
+    private OffsetDateTime validTo;
 }
-

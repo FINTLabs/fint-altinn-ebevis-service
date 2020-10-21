@@ -1,5 +1,6 @@
 package no.fint.ebevis.model.ebevis;
 
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,16 +29,10 @@ public class EvidenceValue {
     private Object value;
 
     @JsonProperty("timestamp")
-    private ZonedDateTime timestamp;
+    private OffsetDateTime timestamp;
 
     @JsonProperty("jsonSchemaDefintion")
     private String jsonSchemaDefinition;
-
-    public EvidenceValue(String evidenceValueName, ValueType valueType, String source) {
-        this.evidenceValueName = evidenceValueName;
-        this.valueType = valueType;
-        this.source = source;
-    }
 
     public void setMimeType(String mimeType) {
         this.mimeType = MediaType.parseMediaType(mimeType);

@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import no.fint.ebevis.configuration.AltinnProperties
 import no.fint.ebevis.model.ebevis.Accreditation
-import no.fint.ebevis.model.ebevis.Error
+import no.fint.ebevis.model.ebevis.ErrorCode
 import no.fint.ebevis.model.ebevis.Evidence
 import no.fint.ebevis.util.MediaTypeSerializer
 import no.fint.ebevis.util.ObjectFactory
@@ -135,62 +134,6 @@ class DataAltinnClientSpec extends Specification {
         then:
         StepVerifier.create(setup)
                 .expectNext([evidenceStatus, evidenceStatus])
-                .verifyComplete()
-    }
-
-    def "get error codes returns mono"() {
-        given:
-        def errorCode = new Error(code: 1, description: 'description')
-
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(objectMapper.writeValueAsString([errorCode, errorCode]))
-                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .setResponseCode(HttpStatus.OK.value()))
-
-        when:
-        def setup = dataAltinnClient.getErrorCodes()
-
-        then:
-        StepVerifier.create(setup)
-                .expectNext([errorCode, errorCode])
-                .verifyComplete()
-    }
-
-    def "get evidence codes returns mono"() {
-        given:
-        def file = getClass().getClassLoader().getResource('accreditation.json')
-        def evidenceCode = objectMapper.readValue(file, Accreditation.class).evidenceCodes.first()
-
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(objectMapper.writeValueAsString([evidenceCode, evidenceCode]))
-                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .setResponseCode(HttpStatus.OK.value()))
-
-        when:
-        def setup = dataAltinnClient.getEvidenceCodes()
-
-        then:
-        StepVerifier.create(setup)
-                .expectNext([evidenceCode, evidenceCode])
-                .verifyComplete()
-    }
-
-    def "get status codes returns mono"() {
-        given:
-        def file = getClass().getClassLoader().getResource('evidence.json')
-        def statusCode = objectMapper.readValue(file, Evidence.class).evidenceStatus.status
-
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(objectMapper.writeValueAsString([statusCode, statusCode]))
-                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .setResponseCode(HttpStatus.OK.value()))
-
-        when:
-        def setup = dataAltinnClient.getStatusCodes()
-
-        then:
-        StepVerifier.create(setup)
-                .expectNext([statusCode, statusCode])
                 .verifyComplete()
     }
 }
