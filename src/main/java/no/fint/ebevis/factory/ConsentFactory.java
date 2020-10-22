@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConsentFactory {
-    private static final String BANKRUPTCY = "KonkursDrosje";
-    private static final String ARREARS = "RestanserDrosje";
+    public static final String BANKRUPTCY = "KonkursDrosje";
+    public static final String ARREARS = "RestanserDrosje";
 
     public static Authorization ofTaxiLicenseApplication(Integer requestor, Integer subject, String reference) {
         Authorization authorization = new Authorization();

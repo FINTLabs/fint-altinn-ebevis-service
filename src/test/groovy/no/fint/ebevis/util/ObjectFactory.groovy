@@ -8,7 +8,6 @@ import no.fint.ebevis.model.ebevis.vocab.ParamType
 import no.fint.ebevis.model.ebevis.vocab.Type
 
 import java.time.OffsetDateTime
-import java.time.ZonedDateTime
 
 class ObjectFactory {
 

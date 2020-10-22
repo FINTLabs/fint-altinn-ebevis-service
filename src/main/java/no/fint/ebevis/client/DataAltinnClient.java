@@ -55,9 +55,9 @@ public class DataAltinnClient {
                 .bodyToMono(Evidence.class);
     }
 
-    public Mono<List<EvidenceStatus>> getEvidenceStatuses(String accreditationId) {
+    public Mono<List<EvidenceStatus>> getEvidenceStatuses(String id) {
         return webClient.get()
-                .uri("/evidence/{accreditationId}", accreditationId)
+                .uri("/evidence/{id}", id)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatus>>() {
                 });

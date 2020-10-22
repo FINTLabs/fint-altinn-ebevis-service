@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.fint.ebevis.model.ebevis.Accreditation
-import no.fint.ebevis.model.ebevis.ErrorCode
 import no.fint.ebevis.model.ebevis.Evidence
 import no.fint.ebevis.util.MediaTypeSerializer
 import no.fint.ebevis.util.ObjectFactory

@@ -10,7 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Document
@@ -22,9 +24,11 @@ public class AltinnApplication {
     private String serviceCode;
     private Integer languageCode;
     private Form form;
-    private List<Attachment> attachments = new ArrayList<>();
-    private List<Evidence> evidence = new ArrayList<>();
+    private String accreditationId;
     private AltinnApplicationStatus status;
+    private List<Evidence> evidence = new ArrayList<>();
+    private List<Attachment> attachments = new ArrayList<>();
+    private Map<String, AltinnApplicationConsentStatus> consents = new HashMap<>();
 
     @Version
     private long version;

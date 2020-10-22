@@ -1,7 +1,6 @@
 package no.fint.ebevis.model.ebevis;
 
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
