@@ -23,12 +23,10 @@ public class AltinnApplication {
     private String subject;
     private String serviceCode;
     private Integer languageCode;
-    private Form form;
-    private String accreditationId;
     private AltinnApplicationStatus status;
-    private List<Evidence> evidence = new ArrayList<>();
+    private Form form;
+    private Consent consent;
     private List<Attachment> attachments = new ArrayList<>();
-    private Map<String, AltinnApplicationConsentStatus> consents = new HashMap<>();
 
     @Version
     private long version;
@@ -52,5 +50,12 @@ public class AltinnApplication {
         private String attachmentType;
         private String attachmentTypeName;
         private String attachmentTypeNameLanguage;
+    }
+
+    @Data
+    public static class Consent {
+        private String id;
+        private Map<String, ConsentStatus> status = new HashMap<>();
+        private List<Evidence> evidence = new ArrayList<>();
     }
 }
