@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.fint.ebevis.client.DataAltinnClient;
 import no.fint.ebevis.factory.ConsentFactory;
 import no.fint.ebevis.model.AltinnApplication;
-import no.fint.ebevis.model.AltinnApplicationConsentStatus;
+import no.fint.ebevis.model.ConsentStatus;
 import no.fint.ebevis.model.AltinnApplicationStatus;
 import no.fint.ebevis.model.ebevis.*;
 import no.fint.ebevis.repository.AltinnApplicationRepository;
@@ -29,7 +29,7 @@ public class ConsentService {
         this.altinnApplicationRepository = altinnApplicationRepository;
     }
 
-    //@Scheduled(initialDelay = 1000, fixedDelay = 10000000)
+    @Scheduled(initialDelay = 1000, fixedDelay = 10000000)
     public void init() {
         AltinnApplication altinnApplication1 = new AltinnApplication();
         altinnApplication1.setRequestor("921693230");
@@ -74,9 +74,12 @@ public class ConsentService {
                             return;
                         }
 
-                        altinnApplication.setAccreditationId(accreditation.getId());
-
                         altinnApplication.setStatus(AltinnApplicationStatus.CONSENT_REQUESTED);
+
+                        AltinnApplication.Consent consent = new AltinnApplication.Consent();
+                        consent.setId(accreditation.getId());
+
+                        altinnApplication.setConsent(consent);
 
                         altinnApplicationRepository.save(altinnApplication);
                     })
@@ -93,32 +96,32 @@ public class ConsentService {
             return;
         }
 
-        altinnApplications.forEach(altinnApplication -> dataAltinnClient.getEvidenceStatuses(altinnApplication.getAccreditationId())
+        altinnApplications.forEach(altinnApplication -> dataAltinnClient.getEvidenceStatuses(altinnApplication.getConsent().getId())
                 .doOnSuccess(evidenceStatuses -> evidenceStatuses.forEach(evidenceStatus -> Optional.ofNullable(evidenceStatus)
                         .map(EvidenceStatus::getStatus)
                         .map(EvidenceStatusCode::getCode)
                         .ifPresent(code -> {
-                            AltinnApplicationConsentStatus altinnApplicationConsentStatus;
+                            ConsentStatus consentStatus;
 
                             switch (code) {
                                 case 1:
-                                    altinnApplicationConsentStatus = AltinnApplicationConsentStatus.CONSENT_ACCEPTED;
+                                    consentStatus = ConsentStatus.CONSENT_ACCEPTED;
                                     break;
                                 case 2:
-                                    altinnApplicationConsentStatus = AltinnApplicationConsentStatus.CONSENT_REQUESTED;
+                                    consentStatus = ConsentStatus.CONSENT_REQUESTED;
                                     break;
                                 case 3:
-                                    altinnApplicationConsentStatus = AltinnApplicationConsentStatus.CONSENT_REJECTED;
+                                    consentStatus = ConsentStatus.CONSENT_REJECTED;
                                     break;
                                 case 4:
-                                    altinnApplicationConsentStatus = AltinnApplicationConsentStatus.CONSENT_EXPIRED;
+                                    consentStatus = ConsentStatus.CONSENT_EXPIRED;
                                     break;
                                 default:
-                                    altinnApplicationConsentStatus = AltinnApplicationConsentStatus.AWAITING_DATA_FROM_SOURCE;
+                                    consentStatus = ConsentStatus.AWAITING_DATA_FROM_SOURCE;
                                     break;
                             }
 
-                            altinnApplication.getConsents().put(evidenceStatus.getEvidenceCodeName(), altinnApplicationConsentStatus);
+                            altinnApplication.getConsent().getStatus().put(evidenceStatus.getEvidenceCodeName(), consentStatus);
 
                             altinnApplicationRepository.save(altinnApplication);
                         })))
@@ -135,11 +138,11 @@ public class ConsentService {
         }
 
         altinnApplications.stream().filter(hasAcceptedAllConsents)
-                .forEach(altinnApplication -> Flux.fromIterable(altinnApplication.getConsents().keySet())
-                        .flatMap(evidenceCodeName -> dataAltinnClient.getEvidence(altinnApplication.getAccreditationId(), evidenceCodeName))
+                .forEach(altinnApplication -> Flux.fromIterable(altinnApplication.getConsent().getStatus().keySet())
+                        .flatMap(evidenceCodeName -> dataAltinnClient.getEvidence(altinnApplication.getConsent().getId(), evidenceCodeName))
                         .collectList()
                         .doOnSuccess(evidence -> {
-                            evidence.forEach(altinnApplication.getEvidence()::add);
+                            evidence.forEach(altinnApplication.getConsent().getEvidence()::add);
 
                             altinnApplication.setStatus(AltinnApplicationStatus.EVIDENCE_FETCHED);
 
@@ -151,8 +154,8 @@ public class ConsentService {
     }
 
     private final Predicate<AltinnApplication> hasAcceptedAllConsents = altinnApplication -> {
-        Collection<AltinnApplicationConsentStatus> consentStatuses = altinnApplication.getConsents().values();
+        Collection<ConsentStatus> consentStatuses = altinnApplication.getConsent().getStatus().values();
 
-        return !consentStatuses.isEmpty() && consentStatuses.stream().allMatch(AltinnApplicationConsentStatus.CONSENT_ACCEPTED::equals);
+        return !consentStatuses.isEmpty() && consentStatuses.stream().allMatch(ConsentStatus.CONSENT_ACCEPTED::equals);
     };
 }
