@@ -10,10 +10,10 @@ public class ConsentFactory {
     public static final String BANKRUPTCY = "KonkursDrosje";
     public static final String ARREARS = "RestanserDrosje";
 
-    public static Authorization ofTaxiLicenseApplication(Integer requestor, Integer subject, String reference) {
+    public static Authorization ofTaxiLicenseApplication(String requestor, String subject, String reference) {
         Authorization authorization = new Authorization();
-        authorization.setRequestor(requestor);
-        authorization.setSubject(subject);
+        authorization.setRequestor(Integer.parseInt(requestor));
+        authorization.setSubject(Integer.parseInt(subject));
 
         EvidenceRequest bankruptcy = new EvidenceRequest();
         bankruptcy.setEvidenceCodeName(BANKRUPTCY);

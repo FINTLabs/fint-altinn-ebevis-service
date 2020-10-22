@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Component
@@ -35,13 +35,11 @@ public class DataAltinnClient {
                 .toBodilessEntity();
     }
 
-    public Mono<List<Accreditation>> getAccreditations(String requestor, ZonedDateTime changedAfter, Boolean onlyAvailable) {
+    public Mono<List<Accreditation>> getAccreditations(OffsetDateTime changedAfter) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/accreditations")
-                        .queryParam("requestor", requestor)
                         .queryParam("changedafter", changedAfter)
-                        .queryParam("onlyavailable", onlyAvailable)
                         .build())
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<Accreditation>>() {

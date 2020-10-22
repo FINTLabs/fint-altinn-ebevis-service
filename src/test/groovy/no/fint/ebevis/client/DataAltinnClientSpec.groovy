@@ -17,7 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.test.StepVerifier
 import spock.lang.Specification
 
-import java.time.ZonedDateTime
+import java.time.OffsetDateTime
 
 class DataAltinnClientSpec extends Specification {
     ObjectMapper objectMapper = new ObjectMapper()
@@ -90,7 +90,7 @@ class DataAltinnClientSpec extends Specification {
                 .setResponseCode(HttpStatus.OK.value()))
 
         when:
-        def setup = dataAltinnClient.getAccreditations(_ as String, ZonedDateTime.now(), _ as Boolean)
+        def setup = dataAltinnClient.getAccreditations(OffsetDateTime.now())
 
         then:
         StepVerifier.create(setup)

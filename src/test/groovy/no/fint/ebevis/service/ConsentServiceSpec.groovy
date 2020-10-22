@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity
 import reactor.core.publisher.Mono
 import spock.lang.Specification
 
+import java.time.OffsetDateTime
+
 class ConsentServiceSpec extends Specification {
     DataAltinnClient client = Mock()
     AltinnApplicationRepository repository = Mock()
@@ -26,41 +28,42 @@ class ConsentServiceSpec extends Specification {
         def accreditation = new Accreditation(id: _ as String)
 
         when:
-        service.consentNew()
+        service.checkForNewApplications()
 
         then:
         1 * repository.findByStatus(AltinnApplicationStatus.NEW) >> [application]
         1 * client.createAccreditation(_ as Authorization) >> Mono.just(ResponseEntity.created(URI.create('location')).body(accreditation))
-        1 * repository.save(new AltinnApplication(status: AltinnApplicationStatus.CONSENT_REQUESTED, requestor: 123, subject: 456,
+        1 * repository.save(new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, requestor: 123, subject: 456,
                 archiveReference: 'reference', consent: new AltinnApplication.Consent(id: _ as String)))
     }
 
     def "consentStatus changes consent status when consent is accepted"() {
         given:
-        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENT_REQUESTED, consent: new AltinnApplication.Consent(id: _ as String))
+        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, consent: new AltinnApplication.Consent(id: _ as String))
         def accepted = new EvidenceStatus(evidenceCodeName: _ as String, status: new EvidenceStatusCode(code: 1))
         def requested = new EvidenceStatus(evidenceCodeName: _ as String, status: new EvidenceStatusCode(code: 2))
 
         when:
-        service.consentStatus()
+        service.checkForNewConsentStatuses()
 
         then:
-        1 * repository.findByStatus(AltinnApplicationStatus.CONSENT_REQUESTED) >> [application]
+        1 * client.getAccreditations(_ as OffsetDateTime) >> Mono.just([new Accreditation(id: _ as String)])
+        1 * repository.findAllByConsentIdIn([_ as String]) >> [application]
         1 * client.getEvidenceStatuses(_ as String) >> Mono.just([accepted, requested])
-        1 * repository.save(new AltinnApplication(status: AltinnApplicationStatus.CONSENT_REQUESTED,
+        1 * repository.save(new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED,
                 consent: new AltinnApplication.Consent(id: _ as String, status: [(_ as String): ConsentStatus.CONSENT_ACCEPTED, (_ as String): ConsentStatus.CONSENT_REQUESTED])))
     }
 
     def "evidence changes consent status when consent is accepted"() {
         given:
-        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENT_REQUESTED,
+        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_ACCEPTED,
                 consent: new AltinnApplication.Consent(id: _ as String, status: [(_ as String): ConsentStatus.CONSENT_ACCEPTED]))
 
         when:
-        service.evidence()
+        service.gatherEvidence()
 
         then:
-        1 * repository.findByStatus(AltinnApplicationStatus.CONSENT_REQUESTED) >> [application]
+        1 * repository.findByStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED) >> [application]
         1 * client.getEvidence(_ as String, _ as String) >> Mono.just(new Evidence())
         1 * repository.save(new AltinnApplication(status: AltinnApplicationStatus.EVIDENCE_FETCHED,
                 consent: new AltinnApplication.Consent(id: _ as String, status: [(_ as String): ConsentStatus.CONSENT_ACCEPTED], evidence: [new Evidence()])))

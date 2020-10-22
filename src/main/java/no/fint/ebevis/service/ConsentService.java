@@ -13,149 +13,146 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ConsentService {
-    private final DataAltinnClient dataAltinnClient;
-    private final AltinnApplicationRepository altinnApplicationRepository;
+    private final DataAltinnClient client;
+    private final AltinnApplicationRepository repository;
 
-    public ConsentService(DataAltinnClient dataAltinnClient, AltinnApplicationRepository altinnApplicationRepository) {
-        this.dataAltinnClient = dataAltinnClient;
-        this.altinnApplicationRepository = altinnApplicationRepository;
-    }
+    private OffsetDateTime lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
 
-    @Scheduled(initialDelay = 1000, fixedDelay = 10000000)
-    public void init() {
-        AltinnApplication altinnApplication1 = new AltinnApplication();
-        altinnApplication1.setRequestor("921693230");
-        altinnApplication1.setSubject("998997801");
-        altinnApplication1.setArchiveReference("ArchiveReference1");
-        altinnApplication1.setStatus(AltinnApplicationStatus.NEW);
-        altinnApplicationRepository.save(altinnApplication1);
-
-        AltinnApplication altinnApplication2 = new AltinnApplication();
-        altinnApplication2.setRequestor("921693230");
-        altinnApplication2.setSubject("998997801");
-        altinnApplication2.setArchiveReference("ArchiveReference2");
-        altinnApplication2.setStatus(AltinnApplicationStatus.NEW);
-
-        altinnApplicationRepository.save(altinnApplication2);
+    public ConsentService(DataAltinnClient client, AltinnApplicationRepository repository) {
+        this.client = client;
+        this.repository = repository;
     }
 
     @Scheduled(initialDelayString = "${scheduling.initial-delay}", fixedDelayString = "${scheduling.fixed-delay}")
     public void run() {
-        consentNew();
+        checkForNewApplications();
 
-        consentStatus();
+        checkForNewConsentStatuses();
 
-        evidence();
+        gatherEvidence();
     }
 
-    public void consentNew() {
-        List<AltinnApplication> altinnApplications = altinnApplicationRepository.findByStatus(AltinnApplicationStatus.NEW);
+    public void checkForNewApplications() {
+        List<AltinnApplication> applications = repository.findByStatus(AltinnApplicationStatus.NEW);
 
-        if (altinnApplications.isEmpty()) {
-            return;
-        }
+        log.info("Found {} new applications.", applications.size());
 
-        altinnApplications.forEach(altinnApplication -> {
-            Authorization authorization = ConsentFactory.ofTaxiLicenseApplication(Integer.parseInt(altinnApplication.getRequestor()), Integer.parseInt(altinnApplication.getSubject()), altinnApplication.getArchiveReference());
+        applications.forEach(application -> {
+            Authorization authorization = ConsentFactory.ofTaxiLicenseApplication(application.getRequestor(), application.getSubject(), application.getArchiveReference());
 
-            dataAltinnClient.createAccreditation(authorization)
-                    .doOnSuccess(responseEntity -> {
-                        Accreditation accreditation = responseEntity.getBody();
+            client.createAccreditation(authorization)
+                    .doOnSuccess(entity -> {
+                        Accreditation accreditation = entity.getBody();
 
                         if (accreditation == null) {
                             return;
                         }
 
-                        altinnApplication.setStatus(AltinnApplicationStatus.CONSENT_REQUESTED);
+                        application.setStatus(AltinnApplicationStatus.CONSENTS_REQUESTED);
 
                         AltinnApplication.Consent consent = new AltinnApplication.Consent();
                         consent.setId(accreditation.getId());
 
-                        altinnApplication.setConsent(consent);
+                        application.setConsent(consent);
 
-                        altinnApplicationRepository.save(altinnApplication);
+                        repository.save(application);
                     })
-                    .doOnError(WebClientResponseException.class, webClientResponseException ->
-                            log.error(webClientResponseException.getResponseBodyAsString(), webClientResponseException))
+                    .doOnError(WebClientResponseException.class, exception -> log.error(exception.getResponseBodyAsString(), exception))
                     .block();
         });
     }
 
-    public void consentStatus() {
-        List<AltinnApplication> altinnApplications = altinnApplicationRepository.findByStatus(AltinnApplicationStatus.CONSENT_REQUESTED);
+    public void checkForNewConsentStatuses() {
+        List<String> ids;
 
-        if (altinnApplications.isEmpty()) {
+        try {
+            ids = client.getAccreditations(lastUpdated)
+                    .blockOptional()
+                    .orElseGet(Collections::emptyList)
+                    .stream()
+                    .map(Accreditation::getId)
+                    .collect(Collectors.toList());
+        } catch (WebClientResponseException ex) {
             return;
         }
 
-        altinnApplications.forEach(altinnApplication -> dataAltinnClient.getEvidenceStatuses(altinnApplication.getConsent().getId())
-                .doOnSuccess(evidenceStatuses -> evidenceStatuses.forEach(evidenceStatus -> Optional.ofNullable(evidenceStatus)
-                        .map(EvidenceStatus::getStatus)
-                        .map(EvidenceStatusCode::getCode)
-                        .ifPresent(code -> {
-                            ConsentStatus consentStatus;
+        List<AltinnApplication> applications = repository.findAllByConsentIdIn(ids);
 
-                            switch (code) {
-                                case 1:
-                                    consentStatus = ConsentStatus.CONSENT_ACCEPTED;
-                                    break;
-                                case 2:
-                                    consentStatus = ConsentStatus.CONSENT_REQUESTED;
-                                    break;
-                                case 3:
-                                    consentStatus = ConsentStatus.CONSENT_REJECTED;
-                                    break;
-                                case 4:
-                                    consentStatus = ConsentStatus.CONSENT_EXPIRED;
-                                    break;
-                                default:
-                                    consentStatus = ConsentStatus.AWAITING_DATA_FROM_SOURCE;
-                                    break;
-                            }
+        log.info("Found {} applications with new consent status since {}.", applications.size(), lastUpdated.toString());
 
-                            altinnApplication.getConsent().getStatus().put(evidenceStatus.getEvidenceCodeName(), consentStatus);
+        lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
 
-                            altinnApplicationRepository.save(altinnApplication);
-                        })))
-                .doOnError(WebClientResponseException.class, webClientResponseException ->
-                        log.error(webClientResponseException.getResponseBodyAsString(), webClientResponseException))
+        applications.stream()
+                .peek(application -> client.getEvidenceStatuses(application.getConsent().getId())
+                        .doOnSuccess(statuses -> updateConsentStatuses(application, statuses))
+                        .doOnError(WebClientResponseException.class, exception -> log.error(exception.getResponseBodyAsString(), exception))
+                        .block())
+                .forEach(repository::save);
+    }
+
+    public void gatherEvidence() {
+        List<AltinnApplication> applications = repository.findByStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED);
+
+        log.info("Found {} applications with all consents accepted.", applications.size());
+
+        applications.forEach(application -> Flux.fromIterable(application.getConsent().getStatus().keySet())
+                .flatMap(evidenceCodeName -> client.getEvidence(application.getConsent().getId(), evidenceCodeName))
+                .collectList()
+                .doOnSuccess(evidence -> {
+                    evidence.forEach(application.getConsent().getEvidence()::add);
+
+                    application.setStatus(AltinnApplicationStatus.EVIDENCE_FETCHED);
+
+                    repository.save(application);
+                })
+                .doOnError(WebClientResponseException.class, exception -> log.error(exception.getResponseBodyAsString(), exception))
                 .block());
     }
 
-    public void evidence() {
-        List<AltinnApplication> altinnApplications = altinnApplicationRepository.findByStatus(AltinnApplicationStatus.CONSENT_REQUESTED);
+    private void updateConsentStatuses(AltinnApplication application, List<EvidenceStatus> statuses) {
+        statuses.forEach(status -> Optional.ofNullable(status)
+                .map(EvidenceStatus::getStatus)
+                .map(EvidenceStatusCode::getCode)
+                .ifPresent(code -> {
+                    ConsentStatus consentStatus;
 
-        if (altinnApplications.isEmpty()) {
-            return;
+                    switch (code) {
+                        case 1:
+                            consentStatus = ConsentStatus.CONSENT_ACCEPTED;
+                            break;
+                        case 2:
+                            consentStatus = ConsentStatus.CONSENT_REQUESTED;
+                            break;
+                        case 3:
+                            consentStatus = ConsentStatus.CONSENT_REJECTED;
+                            break;
+                        case 4:
+                            consentStatus = ConsentStatus.CONSENT_EXPIRED;
+                            break;
+                        default:
+                            consentStatus = ConsentStatus.AWAITING_DATA_FROM_SOURCE;
+                            break;
+                    }
+
+                    application.getConsent().getStatus().put(status.getEvidenceCodeName(), consentStatus);
+                })
+        );
+
+        Collection<ConsentStatus> consentStatuses = application.getConsent().getStatus().values();
+
+        if (!consentStatuses.isEmpty() && consentStatuses.stream().allMatch(ConsentStatus.CONSENT_ACCEPTED::equals)) {
+            application.setStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED);
         }
-
-        altinnApplications.stream().filter(hasAcceptedAllConsents)
-                .forEach(altinnApplication -> Flux.fromIterable(altinnApplication.getConsent().getStatus().keySet())
-                        .flatMap(evidenceCodeName -> dataAltinnClient.getEvidence(altinnApplication.getConsent().getId(), evidenceCodeName))
-                        .collectList()
-                        .doOnSuccess(evidence -> {
-                            evidence.forEach(altinnApplication.getConsent().getEvidence()::add);
-
-                            altinnApplication.setStatus(AltinnApplicationStatus.EVIDENCE_FETCHED);
-
-                            altinnApplicationRepository.save(altinnApplication);
-                        })
-                        .doOnError(WebClientResponseException.class, webClientResponseException ->
-                                log.error(webClientResponseException.getResponseBodyAsString(), webClientResponseException))
-                        .block());
     }
-
-    private final Predicate<AltinnApplication> hasAcceptedAllConsents = altinnApplication -> {
-        Collection<ConsentStatus> consentStatuses = altinnApplication.getConsent().getStatus().values();
-
-        return !consentStatuses.isEmpty() && consentStatuses.stream().allMatch(ConsentStatus.CONSENT_ACCEPTED::equals);
-    };
 }

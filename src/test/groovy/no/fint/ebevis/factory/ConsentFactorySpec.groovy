@@ -6,7 +6,7 @@ class ConsentFactorySpec extends Specification {
 
     def "ofTaxiLicenseApplication returns Authorization"() {
         when:
-        def authorization = ConsentFactory.ofTaxiLicenseApplication(123, 456, 'consent-reference')
+        def authorization = ConsentFactory.ofTaxiLicenseApplication('123', '456', 'consent-reference')
 
         then:
         authorization.requestor == 123

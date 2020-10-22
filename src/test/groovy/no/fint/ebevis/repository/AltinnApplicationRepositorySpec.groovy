@@ -12,14 +12,26 @@ class AltinnApplicationRepositorySpec extends Specification {
     @Autowired
     AltinnApplicationRepository repository
 
-    def "findByStatus() returns documents given status"() {
+    def "findAllByStatus() returns documents given status"() {
         given:
         repository.saveAll(Arrays.asList(new AltinnApplication(status: AltinnApplicationStatus.NEW),
-                new AltinnApplication(status: AltinnApplicationStatus.CONSENT_REQUESTED),
-                new AltinnApplication(status: AltinnApplicationStatus.CONSENT_REQUESTED)))
+                new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED),
+                new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED)))
 
         when:
         def documents = repository.findByStatus(AltinnApplicationStatus.NEW)
+
+        then:
+        documents.size() == 1
+    }
+
+    def "findAllByConsentIdIn() returns documents given status"() {
+        given:
+        repository.saveAll(Arrays.asList(new AltinnApplication(consent: new AltinnApplication.Consent(id: 'id1')),
+                new AltinnApplication(consent: new AltinnApplication.Consent(id: 'id2'))))
+
+        when:
+        def documents = repository.findAllByConsentIdIn(['id1'])
 
         then:
         documents.size() == 1
