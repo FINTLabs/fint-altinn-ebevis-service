@@ -29,7 +29,7 @@ public class ConsentService {
         this.altinnApplicationRepository = altinnApplicationRepository;
     }
 
-    @Scheduled(initialDelay = 1000, fixedDelay = 10000000)
+    //@Scheduled(initialDelay = 1000, fixedDelay = 10000000)
     public void init() {
         AltinnApplication altinnApplication1 = new AltinnApplication();
         altinnApplication1.setRequestor("921693230");
@@ -98,27 +98,27 @@ public class ConsentService {
                         .map(EvidenceStatus::getStatus)
                         .map(EvidenceStatusCode::getCode)
                         .ifPresent(code -> {
-                            AltinnApplicationConsentStatus altinnApplicationStatus;
+                            AltinnApplicationConsentStatus altinnApplicationConsentStatus;
 
                             switch (code) {
                                 case 1:
-                                    altinnApplicationStatus = AltinnApplicationConsentStatus.CONSENT_ACCEPTED;
+                                    altinnApplicationConsentStatus = AltinnApplicationConsentStatus.CONSENT_ACCEPTED;
                                     break;
                                 case 2:
-                                    altinnApplicationStatus = AltinnApplicationConsentStatus.CONSENT_REQUESTED;
+                                    altinnApplicationConsentStatus = AltinnApplicationConsentStatus.CONSENT_REQUESTED;
                                     break;
                                 case 3:
-                                    altinnApplicationStatus = AltinnApplicationConsentStatus.CONSENT_REJECTED;
+                                    altinnApplicationConsentStatus = AltinnApplicationConsentStatus.CONSENT_REJECTED;
                                     break;
                                 case 4:
-                                    altinnApplicationStatus = AltinnApplicationConsentStatus.CONSENT_EXPIRED;
+                                    altinnApplicationConsentStatus = AltinnApplicationConsentStatus.CONSENT_EXPIRED;
                                     break;
                                 default:
-                                    altinnApplicationStatus = AltinnApplicationConsentStatus.AWAITING_DATA_FROM_SOURCE;
+                                    altinnApplicationConsentStatus = AltinnApplicationConsentStatus.AWAITING_DATA_FROM_SOURCE;
                                     break;
                             }
 
-                            altinnApplication.getConsents().put(evidenceStatus.getEvidenceCodeName(), altinnApplicationStatus);
+                            altinnApplication.getConsents().put(evidenceStatus.getEvidenceCodeName(), altinnApplicationConsentStatus);
 
                             altinnApplicationRepository.save(altinnApplication);
                         })))
@@ -142,6 +142,7 @@ public class ConsentService {
                             evidence.forEach(altinnApplication.getEvidence()::add);
 
                             altinnApplication.setStatus(AltinnApplicationStatus.EVIDENCE_FETCHED);
+
                             altinnApplicationRepository.save(altinnApplication);
                         })
                         .doOnError(WebClientResponseException.class, webClientResponseException ->
