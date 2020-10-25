@@ -42,8 +42,7 @@ public class DataAltinnClient {
                         .queryParam("changedafter", changedAfter)
                         .build())
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Accreditation>>() {
-                });
+                .bodyToMono(new ParameterizedTypeReference<List<Accreditation>>() {});
     }
 
     public Mono<Evidence> getEvidence(String accreditationId, String evidenceCode) {
@@ -57,7 +56,6 @@ public class DataAltinnClient {
         return webClient.get()
                 .uri("/evidence/{id}", id)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatus>>() {
-                });
+                .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatus>>() {});
     }
 }

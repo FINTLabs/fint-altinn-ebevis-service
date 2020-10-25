@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface AltinnApplicationRepository extends MongoRepository<AltinnApplication, String> {
 
-    List<AltinnApplication> findByStatus(AltinnApplicationStatus status);
+    List<AltinnApplication> findAllByStatus(AltinnApplicationStatus status);
 
     List<AltinnApplication> findAllByConsentIdIn(List<String> ids);
 }

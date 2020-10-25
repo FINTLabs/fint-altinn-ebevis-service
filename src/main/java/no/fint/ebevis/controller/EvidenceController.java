@@ -25,4 +25,9 @@ public class EvidenceController {
     @ExceptionHandler(WebClientResponseException.class)
     public void notFound() {
     }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(Exception.class)
+    public void badRequest() {
+    }
 }

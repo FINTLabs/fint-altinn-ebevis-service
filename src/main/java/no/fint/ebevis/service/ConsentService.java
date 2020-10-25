@@ -8,10 +8,12 @@ import no.fint.ebevis.model.ConsentStatus;
 import no.fint.ebevis.model.AltinnApplicationStatus;
 import no.fint.ebevis.model.ebevis.*;
 import no.fint.ebevis.repository.AltinnApplicationRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -36,15 +38,15 @@ public class ConsentService {
 
     @Scheduled(initialDelayString = "${scheduling.initial-delay}", fixedDelayString = "${scheduling.fixed-delay}")
     public void run() {
-        checkForNewApplications();
+        checkOnConsentStatuses();
 
-        checkForNewConsentStatuses();
+        checkForNewApplications();
 
         gatherEvidence();
     }
 
     public void checkForNewApplications() {
-        List<AltinnApplication> applications = repository.findByStatus(AltinnApplicationStatus.NEW);
+        List<AltinnApplication> applications = repository.findAllByStatus(AltinnApplicationStatus.NEW);
 
         log.info("Found {} new applications.", applications.size());
 
@@ -68,12 +70,13 @@ public class ConsentService {
 
                         repository.save(application);
                     })
-                    .doOnError(WebClientResponseException.class, exception -> log.error(exception.getResponseBodyAsString(), exception))
+                    .doOnError(WebClientResponseException.class, ex -> log.error(ex.getResponseBodyAsString()))
+                    .onErrorResume(it -> Mono.empty())
                     .block();
         });
     }
 
-    public void checkForNewConsentStatuses() {
+    public void checkOnConsentStatuses() {
         List<String> ids;
 
         try {
@@ -84,6 +87,7 @@ public class ConsentService {
                     .map(Accreditation::getId)
                     .collect(Collectors.toList());
         } catch (WebClientResponseException ex) {
+            log.error(ex.getResponseBodyAsString());
             return;
         }
 
@@ -91,18 +95,19 @@ public class ConsentService {
 
         log.info("Found {} applications with new consent status since {}.", applications.size(), lastUpdated.toString());
 
-        lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
-
         applications.stream()
                 .peek(application -> client.getEvidenceStatuses(application.getConsent().getId())
                         .doOnSuccess(statuses -> updateConsentStatuses(application, statuses))
-                        .doOnError(WebClientResponseException.class, exception -> log.error(exception.getResponseBodyAsString(), exception))
+                        .doOnError(WebClientResponseException.class, ex -> log.error(ex.getResponseBodyAsString()))
+                        .onErrorResume(it -> Mono.empty())
                         .block())
                 .forEach(repository::save);
+
+        lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     }
 
     public void gatherEvidence() {
-        List<AltinnApplication> applications = repository.findByStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED);
+        List<AltinnApplication> applications = repository.findAllByStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED);
 
         log.info("Found {} applications with all consents accepted.", applications.size());
 
@@ -116,7 +121,8 @@ public class ConsentService {
 
                     repository.save(application);
                 })
-                .doOnError(WebClientResponseException.class, exception -> log.error(exception.getResponseBodyAsString(), exception))
+                .doOnError(WebClientResponseException.class, ex -> log.error(ex.getResponseBodyAsString()))
+                .onErrorResume(it -> Mono.empty())
                 .block());
     }
 

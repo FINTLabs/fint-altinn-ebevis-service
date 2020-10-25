@@ -31,7 +31,7 @@ class ConsentServiceSpec extends Specification {
         service.checkForNewApplications()
 
         then:
-        1 * repository.findByStatus(AltinnApplicationStatus.NEW) >> [application]
+        1 * repository.findAllByStatus(AltinnApplicationStatus.NEW) >> [application]
         1 * client.createAccreditation(_ as Authorization) >> Mono.just(ResponseEntity.created(URI.create('location')).body(accreditation))
         1 * repository.save(new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, requestor: 123, subject: 456,
                 archiveReference: 'reference', consent: new AltinnApplication.Consent(id: _ as String)))
@@ -44,7 +44,7 @@ class ConsentServiceSpec extends Specification {
         def requested = new EvidenceStatus(evidenceCodeName: _ as String, status: new EvidenceStatusCode(code: 2))
 
         when:
-        service.checkForNewConsentStatuses()
+        service.checkOnConsentStatuses()
 
         then:
         1 * client.getAccreditations(_ as OffsetDateTime) >> Mono.just([new Accreditation(id: _ as String)])
@@ -63,7 +63,7 @@ class ConsentServiceSpec extends Specification {
         service.gatherEvidence()
 
         then:
-        1 * repository.findByStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED) >> [application]
+        1 * repository.findAllByStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED) >> [application]
         1 * client.getEvidence(_ as String, _ as String) >> Mono.just(new Evidence())
         1 * repository.save(new AltinnApplication(status: AltinnApplicationStatus.EVIDENCE_FETCHED,
                 consent: new AltinnApplication.Consent(id: _ as String, status: [(_ as String): ConsentStatus.CONSENT_ACCEPTED], evidence: [new Evidence()])))

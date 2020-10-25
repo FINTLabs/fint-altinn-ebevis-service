@@ -40,13 +40,11 @@ public class AltinnApplication {
     @Data
     public static class Form {
         private String formData;
-        private byte[] formDataPdf;
     }
 
     @Data
     public static class Attachment {
         private Integer attachmentId;
-        private byte[] attachmentData;
         private String attachmentType;
         private String attachmentTypeName;
         private String attachmentTypeNameLanguage;

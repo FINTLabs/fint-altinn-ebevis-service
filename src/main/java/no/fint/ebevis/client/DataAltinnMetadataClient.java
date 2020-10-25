@@ -25,39 +25,34 @@ public class DataAltinnMetadataClient {
         return webClient.get()
                 .uri("/public/metadata/errorcodes")
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<ErrorCode>>() {
-                });
+                .bodyToMono(new ParameterizedTypeReference<List<ErrorCode>>() {});
     }
 
     public Mono<List<EvidenceStatusCode>> getStatusCodes() {
         return webClient.get()
                 .uri("/public/metadata/statuscodes")
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatusCode>>() {
-                });
+                .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatusCode>>() {});
     }
 
     public Mono<List<EvidenceCode>> getEvidenceCodes() {
         return webClient.get()
                 .uri("/public/metadata/evidencecodes")
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<EvidenceCode>>() {
-                });
+                .bodyToMono(new ParameterizedTypeReference<List<EvidenceCode>>() {});
     }
 
     public Mono<List<String>> getServiceContexts() {
         return webClient.get()
                 .uri("/public/metadata/servicecontexts")
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<String>>() {
-                });
+                .bodyToMono(new ParameterizedTypeReference<List<String>>() {});
     }
 
     public Mono<List<EvidenceCode>> getEvidenceCodesWithinServiceContext(String serviceContext) {
         return webClient.get()
                 .uri("/public/metadata/evidencecodes/{serviceContext}", serviceContext)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<EvidenceCode>>() {
-                });
+                .bodyToMono(new ParameterizedTypeReference<List<EvidenceCode>>() {});
     }
 }

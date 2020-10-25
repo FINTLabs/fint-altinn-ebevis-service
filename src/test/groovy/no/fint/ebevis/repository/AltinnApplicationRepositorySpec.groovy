@@ -19,7 +19,7 @@ class AltinnApplicationRepositorySpec extends Specification {
                 new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED)))
 
         when:
-        def documents = repository.findByStatus(AltinnApplicationStatus.NEW)
+        def documents = repository.findAllByStatus(AltinnApplicationStatus.NEW)
 
         then:
         documents.size() == 1
