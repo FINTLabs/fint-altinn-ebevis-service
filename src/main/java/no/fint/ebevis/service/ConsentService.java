@@ -25,7 +25,7 @@ public class ConsentService {
     private final DataAltinnClient client;
     private final AltinnApplicationRepository repository;
 
-    private OffsetDateTime lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+    private OffsetDateTime lastUpdated = OffsetDateTime.parse("1970-01-01T00:00:00Z");//OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
 
     public ConsentService(DataAltinnClient client, AltinnApplicationRepository repository) {
         this.client = client;

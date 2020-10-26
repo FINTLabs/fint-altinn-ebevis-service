@@ -1,6 +1,6 @@
 scheduling:
   initial-delay: 10000
-  fixed-delay: 7200000
+  fixed-delay: 60000
 
 altinn:
   base-url: https://test-api.data.altinn.no/v1
