@@ -12,6 +12,7 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
 import javax.net.ssl.KeyManagerFactory;
+import java.io.FileInputStream;
 import java.security.KeyStore;
 
 @Configuration
@@ -47,7 +48,8 @@ public class SecurityConfiguration {
     public SslContext sslContext() {
         try {
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
-            keyStore.load(getClass().getClassLoader().getResourceAsStream(altinnProperties.getKeyStoreFile()), altinnProperties.getKeyStorePassword().toCharArray());
+
+            keyStore.load(new FileInputStream(altinnProperties.getKeyStoreFile()), altinnProperties.getKeyStorePassword().toCharArray());
 
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(keyStore, altinnProperties.getKeyStorePassword().toCharArray());
