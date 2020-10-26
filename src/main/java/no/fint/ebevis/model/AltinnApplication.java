@@ -16,9 +16,13 @@ import java.util.Map;
 public class AltinnApplication {
     @Id
     private String archiveReference;
+    private String caseId;
     private String accreditationId;
+    private LocalDateTime archivedDate;
     private String requestor;
+    private String requestorName;
     private String subject;
+    private String subjectName;
     private String serviceCode;
     private Integer languageCode;
     private AltinnApplicationStatus status;
@@ -38,6 +42,7 @@ public class AltinnApplication {
     @Data
     public static class Form {
         private String formData;
+        private String documentId;
     }
 
     @Data
@@ -46,6 +51,8 @@ public class AltinnApplication {
         private String attachmentType;
         private String attachmentTypeName;
         private String attachmentTypeNameLanguage;
+        private String fileName;
+        private String documentId;
     }
 
     @Data
