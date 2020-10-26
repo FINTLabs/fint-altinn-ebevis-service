@@ -25,13 +25,12 @@ class AltinnApplicationRepositorySpec extends Specification {
         documents.size() == 1
     }
 
-    def "findAllByConsentIdIn() returns documents given status"() {
+    def "findAllByAccreditationIdIn() returns documents given status"() {
         given:
-        repository.saveAll(Arrays.asList(new AltinnApplication(consent: new AltinnApplication.Consent(id: 'id1')),
-                new AltinnApplication(consent: new AltinnApplication.Consent(id: 'id2'))))
+        repository.saveAll(Arrays.asList(new AltinnApplication(accreditationId: 'id1'), new AltinnApplication(accreditationId: 'id2')))
 
         when:
-        def documents = repository.findAllByConsentIdIn(['id1'])
+        def documents = repository.findAllByAccreditationIdIn(['id1'])
 
         then:
         documents.size() == 1
