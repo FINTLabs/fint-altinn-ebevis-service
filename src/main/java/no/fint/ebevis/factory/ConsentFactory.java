@@ -1,5 +1,6 @@
 package no.fint.ebevis.factory;
 
+import no.fint.ebevis.model.AltinnApplication;
 import no.fint.ebevis.model.ebevis.Authorization;
 import no.fint.ebevis.model.ebevis.EvidenceRequest;
 
@@ -10,10 +11,10 @@ public class ConsentFactory {
     public static final String BANKRUPTCY = "KonkursDrosje";
     public static final String ARREARS = "RestanserDrosje";
 
-    public static Authorization ofTaxiLicenseApplication(String requestor, String subject, String reference) {
+    public static Authorization ofTaxiLicenseApplication(AltinnApplication application) {
         Authorization authorization = new Authorization();
-        authorization.setRequestor(Integer.parseInt(requestor));
-        authorization.setSubject(Integer.parseInt(subject));
+        authorization.setRequestor(Integer.parseInt(application.getRequestor()));
+        authorization.setSubject(Integer.parseInt(application.getSubject()));
 
         EvidenceRequest bankruptcy = new EvidenceRequest();
         bankruptcy.setEvidenceCodeName(BANKRUPTCY);
@@ -29,7 +30,7 @@ public class ConsentFactory {
 
         authorization.setEvidenceRequests(evidenceRequests);
 
-        authorization.setConsentReference(reference);
+        authorization.setConsentReference(application.getArchiveReference());
 
         return authorization;
     }

@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,7 +28,7 @@ public class MongoConfiguration {
 
         @Override
         public OffsetDateTime convert(Date source) {
-            return OffsetDateTime.ofInstant(source.toInstant(), ZoneId.systemDefault());
+            return OffsetDateTime.ofInstant(source.toInstant(), ZoneOffset.UTC);
         }
     }
 
