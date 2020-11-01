@@ -67,7 +67,7 @@ class ConsentServiceSpec extends Specification {
 
         then:
         1 * client.getAccreditations(_ as OffsetDateTime) >> Mono.just([new Accreditation(id: _ as String)])
-        1 * repository.findAllByAccreditationIdIn([_ as String]) >> [application]
+        1 * repository.findAllByStatusAndAccreditationIdIn(AltinnApplicationStatus.CONSENTS_REQUESTED, [_ as String]) >> [application]
     }
 
     def "updateStatus changes status when consent is accepted"() {

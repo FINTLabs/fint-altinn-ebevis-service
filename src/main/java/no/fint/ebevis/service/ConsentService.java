@@ -93,7 +93,7 @@ public class ConsentService {
                 .doOnSuccess(accreditations -> {
                     List<String> ids = accreditations.stream().map(Accreditation::getId).collect(Collectors.toList());
 
-                    List<AltinnApplication> applications = repository.findAllByAccreditationIdIn(ids);
+                    List<AltinnApplication> applications = repository.findAllByStatusAndAccreditationIdIn(AltinnApplicationStatus.CONSENTS_REQUESTED, ids);
 
                     log.info("Found {} application(s) with new consent status since {}.", applications.size(), lastUpdated.toString());
 
