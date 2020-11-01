@@ -6,51 +6,113 @@ import no.fint.ebevis.model.ConsentStatus
 import no.fint.ebevis.model.AltinnApplicationStatus
 import no.fint.ebevis.model.ebevis.Accreditation
 import no.fint.ebevis.model.ebevis.Authorization
+import no.fint.ebevis.model.ebevis.EvidenceCode
 import no.fint.ebevis.model.ebevis.EvidenceStatus
 import no.fint.ebevis.model.ebevis.EvidenceStatusCode
+import no.fint.ebevis.model.ebevis.Notification
 import no.fint.ebevis.repository.AltinnApplicationRepository
 import org.springframework.http.ResponseEntity
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.time.OffsetDateTime
 
 class ConsentServiceSpec extends Specification {
     DataAltinnClient client = Mock()
+
     AltinnApplicationRepository repository = Mock()
 
     ConsentService service = new ConsentService(client, repository)
 
-    def "consentNew changes status when accreditation is accepted"() {
+    def "createAccreditations"() {
         given:
-        def application = new AltinnApplication(status: AltinnApplicationStatus.NEW, requestor: 123, subject: 456, archiveReference: 'reference')
+        def application = new AltinnApplication(status: AltinnApplicationStatus.NEW, requestor: 1, subject: 2, archiveReference: _ as String)
 
         when:
-        service.create()
+        service.createAccreditations()
 
         then:
         1 * repository.findAllByStatus(AltinnApplicationStatus.NEW) >> [application]
-        StepVerifier.create(Flux.fromIterable([application]))
-                .expectNext(application)
-                .verifyComplete()
     }
 
-    def "consentStatus changes consent status when consent is accepted"() {
+    def "createAccreditation changes status when consent is requested"() {
         given:
-        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, accreditationId: _ as String,
-                consents: [(_ as String): new AltinnApplication.Consent(evidenceCodeName: _ as String, status: ConsentStatus.CONSENT_REQUESTED)])
+        def application = new AltinnApplication(status: AltinnApplicationStatus.NEW, requestor: 1, subject: 2, archiveReference: _ as String)
+        def accreditation = new Accreditation(id: 'id', issued: OffsetDateTime.parse('2000-01-01T00:00:00Z'), evidenceCodes: [new EvidenceCode(evidenceCodeName: _ as String)])
 
         when:
-        service.update()
+        service.createAccreditation(application)
+
+        then:
+        1 * client.createAccreditation(_ as Authorization) >> Mono.just(ResponseEntity.created(URI.create('uri')).body(accreditation))
+        1 * repository.save(new AltinnApplication(
+                requestor: 1,
+                subject: 2,
+                archiveReference: _ as String,
+                status: AltinnApplicationStatus.CONSENTS_REQUESTED,
+                accreditationId: 'id',
+                accreditationDate: OffsetDateTime.parse('2000-01-01T00:00:00Z'),
+                accreditationCount: 0,
+                consents: [(_ as String): new AltinnApplication.Consent(status: ConsentStatus.CONSENT_REQUESTED, evidenceCodeName: _ as String)]))
+    }
+
+    def "updateStatuses"() {
+        given:
+        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, accreditationId: _ as String)
+
+        when:
+        service.updateStatuses()
 
         then:
         1 * client.getAccreditations(_ as OffsetDateTime) >> Mono.just([new Accreditation(id: _ as String)])
         1 * repository.findAllByAccreditationIdIn([_ as String]) >> [application]
-        StepVerifier.create(Flux.fromIterable([application]))
-                .expectNext(application)
-                .verifyComplete()
+    }
+
+    def "updateStatus changes status when consent is accepted"() {
+        given:
+        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, accreditationId: 'id',
+                consents: [(_ as String): new AltinnApplication.Consent(evidenceCodeName: _ as String, status: ConsentStatus.CONSENT_REQUESTED)])
+        def evidenceStatus = new EvidenceStatus(evidenceCodeName: _ as String, status: new EvidenceStatusCode(code: 1))
+
+        when:
+        service.updateStatus(application)
+
+        then:
+        1 * client.getEvidenceStatuses(_ as String) >> Mono.just([evidenceStatus])
+        1 * repository.save(new AltinnApplication(
+                status: AltinnApplicationStatus.CONSENTS_ACCEPTED,
+                accreditationId: 'id',
+                consents: [(_ as String): new AltinnApplication.Consent(status: ConsentStatus.CONSENT_ACCEPTED, evidenceCodeName: _ as String)]))
+    }
+
+    def "sendReminders"() {
+        given:
+        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, accreditationId: _ as String,
+                accreditationDate: OffsetDateTime.now().minusDays(8), accreditationCount: 1)
+
+        when:
+        service.sendReminders()
+
+        then:
+        1 * repository.findAllByStatus(AltinnApplicationStatus.CONSENTS_REQUESTED) >> [application]
+    }
+
+    def "sendReminder sends reminder"() {
+        given:
+        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, accreditationId: 'id')
+        def notification = new Notification(recipientCount: 1, date: OffsetDateTime.parse('2000-01-01T00:00:00Z'))
+
+        when:
+        service.sendReminder(application)
+
+        then:
+        1 * client.createReminder(_ as String) >> Mono.just(ResponseEntity.ok(notification))
+        1 * repository.save(new AltinnApplication(
+                status: AltinnApplicationStatus.CONSENTS_REQUESTED,
+                accreditationId: 'id',
+                accreditationCount: 1,
+                accreditationDate: OffsetDateTime.parse('2000-01-01T00:00:00Z')))
     }
 }

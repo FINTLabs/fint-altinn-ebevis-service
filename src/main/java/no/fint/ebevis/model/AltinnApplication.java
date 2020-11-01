@@ -21,7 +21,6 @@ public class AltinnApplication {
     private String accreditationId;
     private OffsetDateTime accreditationDate;
     private Integer accreditationCount;
-    private OffsetDateTime consentDate;
     private LocalDateTime archivedDate;
     private String requestor;
     private String requestorName;
