@@ -84,7 +84,7 @@ public class ConsentService {
 
                     repository.save(application);
                 })
-                .doOnError(WebClientResponseException.class, ex -> log.error(ex.getResponseBodyAsString()))
+                .doOnError(WebClientResponseException.class, ex -> log.error("Accreditation of archive reference: {} - {}", application.getArchiveReference(), ex.getResponseBodyAsString()))
                 .subscribe();
     }
 
@@ -146,7 +146,7 @@ public class ConsentService {
                     application.setAccreditationCount(notification.getRecipientCount());
                     repository.save(application);
                 })
-                .doOnError(WebClientResponseException.class, ex -> log.error(ex.getResponseBodyAsString()))
+                .doOnError(WebClientResponseException.class, ex -> log.error("Reminder of archive reference: {} - {}", application.getArchiveReference(), ex.getResponseBodyAsString()))
                 .subscribe();
     }
 
