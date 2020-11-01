@@ -28,6 +28,13 @@ public class DataAltinnClient {
                 .toEntity(Accreditation.class);
     }
 
+    public Mono<ResponseEntity<Notification>> createReminder(String accreditationId) {
+        return webClient.post()
+                .uri("/accreditations/{accreditationId}/reminders", accreditationId)
+                .retrieve()
+                .toEntity(Notification.class);
+    }
+
     public Mono<ResponseEntity<Void>> deleteAccreditation(String accreditationId) {
         return webClient.delete()
                 .uri("/accreditations/{accreditationId}", accreditationId)
