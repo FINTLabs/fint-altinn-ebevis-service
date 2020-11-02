@@ -72,19 +72,23 @@ class ConsentServiceSpec extends Specification {
 
     def "updateStatus changes status when consent is accepted"() {
         given:
-        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, accreditationId: 'id',
-                consents: [(_ as String): new AltinnApplication.Consent(evidenceCodeName: _ as String, status: ConsentStatus.CONSENT_REQUESTED)])
-        def evidenceStatus = new EvidenceStatus(evidenceCodeName: _ as String, status: new EvidenceStatusCode(code: 1))
+        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_ACCEPTED, accreditationId: 'id',
+                consents: [('id1'): new AltinnApplication.Consent(evidenceCodeName: 'id1', status: ConsentStatus.CONSENT_ACCEPTED),
+                           ('id2'): new AltinnApplication.Consent(evidenceCodeName: 'id2', status: ConsentStatus.CONSENT_ACCEPTED)])
+        def evidenceStatus = new EvidenceStatus(evidenceCodeName: 'id1', status: new EvidenceStatusCode(code: 1))
+        def evidenceStatus2 = new EvidenceStatus(evidenceCodeName: 'id2', status: new EvidenceStatusCode(code: 3))
+
 
         when:
         service.updateStatus(application)
 
         then:
-        1 * client.getEvidenceStatuses(_ as String) >> Mono.just([evidenceStatus])
+        1 * client.getEvidenceStatuses(_ as String) >> Mono.just([evidenceStatus, evidenceStatus2])
         1 * repository.save(new AltinnApplication(
-                status: AltinnApplicationStatus.CONSENTS_ACCEPTED,
+                status: AltinnApplicationStatus.CONSENTS_REJECTED_OR_EXPIRED,
                 accreditationId: 'id',
-                consents: [(_ as String): new AltinnApplication.Consent(status: ConsentStatus.CONSENT_ACCEPTED, evidenceCodeName: _ as String)]))
+                consents: [('id1'): new AltinnApplication.Consent(evidenceCodeName: 'id1', status: ConsentStatus.CONSENT_ACCEPTED),
+                           ('id2'): new AltinnApplication.Consent(evidenceCodeName: 'id2', status: ConsentStatus.CONSENT_REJECTED)]))
     }
 
     def "sendReminders"() {
