@@ -25,16 +25,20 @@ class AltinnApplicationRepositorySpec extends Specification {
         documents.size() == 1
     }
 
-    def "findAllByStatusAndAccreditationIdIn() returns documents given status"() {
+    def "findAllByStatusInAndAccreditationIdIn() returns documents given status"() {
         given:
-        repository.saveAll(Arrays.asList(new AltinnApplication(accreditationId: 'id1', status: AltinnApplicationStatus.CONSENTS_REQUESTED),
-                new AltinnApplication(accreditationId: 'id2', status: AltinnApplicationStatus.CONSENTS_ACCEPTED)))
+        repository.saveAll(Arrays.asList(
+                new AltinnApplication(accreditationId: 'id1', status: AltinnApplicationStatus.CONSENTS_REQUESTED),
+                new AltinnApplication(accreditationId: 'id2', status: AltinnApplicationStatus.CONSENTS_ACCEPTED),
+                new AltinnApplication(accreditationId: 'id3', status: AltinnApplicationStatus.ARCHIVED),
+                new AltinnApplication(accreditationId: 'id4', status: AltinnApplicationStatus.PURGED)))
 
         when:
-        def documents = repository.findAllByStatusAndAccreditationIdIn(AltinnApplicationStatus.CONSENTS_REQUESTED, ['id1'])
+        def documents = repository.findAllByStatusInAndAccreditationIdIn([AltinnApplicationStatus.CONSENTS_REQUESTED, AltinnApplicationStatus.CONSENTS_ACCEPTED], ['id1','id2'])
 
         then:
-        documents.size() == 1
+        documents.size() == 2
         documents.get(0).accreditationId == 'id1'
+        documents.get(1).accreditationId == 'id2'
     }
 }

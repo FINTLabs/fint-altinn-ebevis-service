@@ -16,6 +16,7 @@ import reactor.core.publisher.Flux;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -93,7 +94,8 @@ public class ConsentService {
                 .doOnSuccess(accreditations -> {
                     List<String> ids = accreditations.stream().map(Accreditation::getId).collect(Collectors.toList());
 
-                    List<AltinnApplication> applications = repository.findAllByStatusAndAccreditationIdIn(AltinnApplicationStatus.CONSENTS_REQUESTED, ids);
+                    List<AltinnApplication> applications =
+                            repository.findAllByStatusInAndAccreditationIdIn(Arrays.asList(AltinnApplicationStatus.CONSENTS_REQUESTED, AltinnApplicationStatus.CONSENTS_ACCEPTED), ids);
 
                     log.info("Found {} application(s) with new consent status since {}.", applications.size(), lastUpdated.toString());
 
