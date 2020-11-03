@@ -91,6 +91,26 @@ class ConsentServiceSpec extends Specification {
                            ('id2'): new AltinnApplication.Consent(evidenceCodeName: 'id2', status: ConsentStatus.CONSENT_REJECTED)]))
     }
 
+    def "updateStatus does not change status if evidence is fetched before consent is rejected"() {
+        given:
+        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_ACCEPTED, accreditationId: 'id',
+                consents: [('id1'): new AltinnApplication.Consent(evidenceCodeName: 'id1', status: ConsentStatus.CONSENT_ACCEPTED, documentId: 'id1'),
+                           ('id2'): new AltinnApplication.Consent(evidenceCodeName: 'id2', status: ConsentStatus.CONSENT_ACCEPTED, documentId: 'id2')])
+        def evidenceStatus = new EvidenceStatus(evidenceCodeName: 'id1', status: new EvidenceStatusCode(code: 1))
+        def evidenceStatus2 = new EvidenceStatus(evidenceCodeName: 'id2', status: new EvidenceStatusCode(code: 3))
+
+        when:
+        service.updateStatus(application)
+
+        then:
+        1 * client.getEvidenceStatuses(_ as String) >> Mono.just([evidenceStatus, evidenceStatus2])
+        1 * repository.save(new AltinnApplication(
+                status: AltinnApplicationStatus.CONSENTS_ACCEPTED,
+                accreditationId: 'id',
+                consents: [('id1'): new AltinnApplication.Consent(evidenceCodeName: 'id1', status: ConsentStatus.CONSENT_ACCEPTED, documentId: 'id1'),
+                           ('id2'): new AltinnApplication.Consent(evidenceCodeName: 'id2', status: ConsentStatus.CONSENT_REJECTED, documentId: 'id2')]))
+    }
+
     def "sendReminders"() {
         given:
         def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, accreditationId: _ as String,

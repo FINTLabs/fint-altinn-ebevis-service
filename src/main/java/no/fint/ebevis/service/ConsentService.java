@@ -16,10 +16,7 @@ import reactor.core.publisher.Flux;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -177,7 +174,10 @@ public class ConsentService {
                             break;
                     }
 
-                    application.getConsents().get(status.getEvidenceCodeName()).setStatus(consentStatus);
+                    application.getConsents().computeIfPresent(status.getEvidenceCodeName(), (key, value) -> {
+                        value.setStatus(consentStatus);
+                        return value;
+                    });
                 })
         );
 
@@ -194,7 +194,8 @@ public class ConsentService {
     }
 
     private final Predicate<Collection<AltinnApplication.Consent>> isAccepted = consents ->
-            !consents.isEmpty() && consents.stream().map(AltinnApplication.Consent::getStatus).allMatch(ConsentStatus.CONSENT_ACCEPTED::equals);
+            !consents.isEmpty() && (consents.stream().map(AltinnApplication.Consent::getStatus).allMatch(ConsentStatus.CONSENT_ACCEPTED::equals) ||
+                    consents.stream().map(AltinnApplication.Consent::getDocumentId).allMatch(Objects::nonNull));
 
     private final Predicate<Collection<AltinnApplication.Consent>> isCanceled = consents ->
             !consents.isEmpty() && consents.stream().map(AltinnApplication.Consent::getStatus).anyMatch(status ->
