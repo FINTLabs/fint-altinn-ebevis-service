@@ -1,11 +1,13 @@
 package no.fint.ebevis.controller
 
 import no.fint.ebevis.client.DataAltinnClient
+import no.fint.ebevis.model.ebevis.ErrorCode
 import no.fint.ebevis.model.ebevis.Evidence
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
 import spock.lang.Specification
 
@@ -31,5 +33,25 @@ class EvidenceControllerSpec extends Specification {
                 .blockFirst()
 
         first == new Evidence()
+    }
+
+    def "Get application returns error"() {
+        given:
+        def errorCode = '{"code": 1015, "description": "There was an internal server error processing your request."}'
+
+        when:
+        client.getEvidence(_ as String, _ as String) >> Mono.error(new WebClientResponseException(500, null, null, errorCode.bytes, null))
+
+        then:
+        def first = webTestClient.get()
+                .uri("/evidence/123?evidenceCodeName=test")
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .returnResult(ErrorCode.class)
+                .getResponseBody()
+                .blockFirst()
+
+        first.code == 1015
+        first.description == 'There was an internal server error processing your request.'
     }
 }
