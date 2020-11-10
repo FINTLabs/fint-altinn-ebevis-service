@@ -122,7 +122,7 @@ public class ConsentService {
                 .filter(application -> {
                     Duration between = Duration.between(application.getAccreditationDate(), OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC));
 
-                    return (between.toDays() > 7 && application.getAccreditationCount() <= 3);
+                    return (between.toDays() > 7 && application.getAccreditationCount() < 4);
                 }).collect(Collectors.toList());
 
         log.info("Found {} application(s) ready for reminders.", reminders.size());
@@ -134,16 +134,19 @@ public class ConsentService {
 
     public void sendReminder(AltinnApplication application) {
         client.createReminder(application.getAccreditationId())
-                .doOnSuccess(entity -> {
-                    Notification notification = entity.getBody();
-
-                    if (notification == null) {
+                .doOnSuccess(notifications -> {
+                    if (notifications == null) {
                         return;
                     }
 
-                    application.setAccreditationDate(notification.getDate());
-                    application.setAccreditationCount(notification.getRecipientCount());
-                    repository.save(application);
+                    notifications.stream()
+                            .filter(Notification::getSuccess)
+                            .findFirst()
+                            .ifPresent(notification -> {
+                                application.setAccreditationDate(notification.getDate());
+                                application.setAccreditationCount(notification.getRecipientCount());
+                                repository.save(application);
+                            });
                 })
                 .doOnError(WebClientResponseException.class, ex -> log.error("Reminder of archive reference: {} - {}", application.getArchiveReference(), ex.getResponseBodyAsString()))
                 .subscribe();

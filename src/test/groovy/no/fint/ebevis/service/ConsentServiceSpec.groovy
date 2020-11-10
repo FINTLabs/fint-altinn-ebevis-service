@@ -12,9 +12,7 @@ import no.fint.ebevis.model.ebevis.EvidenceStatusCode
 import no.fint.ebevis.model.ebevis.Notification
 import no.fint.ebevis.repository.AltinnApplicationRepository
 import org.springframework.http.ResponseEntity
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.test.StepVerifier
 import spock.lang.Specification
 
 import java.time.OffsetDateTime
@@ -126,13 +124,13 @@ class ConsentServiceSpec extends Specification {
     def "sendReminder sends reminder"() {
         given:
         def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, accreditationId: 'id')
-        def notification = new Notification(recipientCount: 1, date: OffsetDateTime.parse('2000-01-01T00:00:00Z'))
+        def notification = new Notification(success: true, recipientCount: 1, date: OffsetDateTime.parse('2000-01-01T00:00:00Z'))
 
         when:
         service.sendReminder(application)
 
         then:
-        1 * client.createReminder(_ as String) >> Mono.just(ResponseEntity.ok(notification))
+        1 * client.createReminder(_ as String) >> Mono.just([notification])
         1 * repository.save(new AltinnApplication(
                 status: AltinnApplicationStatus.CONSENTS_REQUESTED,
                 accreditationId: 'id',
