@@ -26,6 +26,9 @@ public class AltinnApplication {
     private String requestorName;
     private String subject;
     private String subjectName;
+    private Address businessAddress;
+    private String phone;
+    private String email;
     private String serviceCode;
     private Integer languageCode;
     private AltinnApplicationStatus status;
@@ -63,5 +66,12 @@ public class AltinnApplication {
         private ConsentStatus status;
         private String evidenceCodeName;
         private String documentId;
+    }
+
+    @Data
+    public static class Address {
+        private String address;
+        private String postCode;
+        private String postalArea;
     }
 }
