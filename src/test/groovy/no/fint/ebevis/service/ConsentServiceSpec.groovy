@@ -1,16 +1,19 @@
 package no.fint.ebevis.service
 
 import no.fint.ebevis.client.DataAltinnClient
+import no.fint.ebevis.exception.AltinnException
 import no.fint.ebevis.model.AltinnApplication
 import no.fint.ebevis.model.ConsentStatus
 import no.fint.ebevis.model.AltinnApplicationStatus
 import no.fint.ebevis.model.ebevis.Accreditation
 import no.fint.ebevis.model.ebevis.Authorization
+import no.fint.ebevis.model.ebevis.ErrorCode
 import no.fint.ebevis.model.ebevis.EvidenceCode
 import no.fint.ebevis.model.ebevis.EvidenceStatus
 import no.fint.ebevis.model.ebevis.EvidenceStatusCode
 import no.fint.ebevis.model.ebevis.Notification
 import no.fint.ebevis.repository.AltinnApplicationRepository
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import reactor.core.publisher.Mono
 import spock.lang.Specification
@@ -54,6 +57,22 @@ class ConsentServiceSpec extends Specification {
                 accreditationDate: OffsetDateTime.parse('2000-01-01T00:00:00Z'),
                 accreditationCount: 0,
                 consents: [(_ as String): new AltinnApplication.Consent(status: ConsentStatus.CONSENT_REQUESTED, evidenceCodeName: _ as String)]))
+    }
+
+    def "createAccreditation changes status on invalid subject"() {
+        given:
+        def application = new AltinnApplication(status: AltinnApplicationStatus.NEW, requestor: 1, subject: 2, archiveReference: _ as String)
+
+        when:
+        service.createAccreditation(application)
+
+        then:
+        1 * client.createAccreditation(_ as Authorization) >> Mono.error(new AltinnException(HttpStatus.INTERNAL_SERVER_ERROR, new ErrorCode(code: 1004)))
+        1 * repository.save(new AltinnApplication(
+                requestor: 1,
+                subject: 2,
+                archiveReference: _ as String,
+                status: AltinnApplicationStatus.CONSENTS_INVALID_SUBJECT))
     }
 
     def "updateStatuses"() {

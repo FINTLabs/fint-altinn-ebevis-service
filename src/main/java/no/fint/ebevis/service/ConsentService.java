@@ -2,6 +2,7 @@ package no.fint.ebevis.service;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.ebevis.client.DataAltinnClient;
+import no.fint.ebevis.exception.AltinnException;
 import no.fint.ebevis.factory.ConsentFactory;
 import no.fint.ebevis.model.AltinnApplication;
 import no.fint.ebevis.model.ConsentStatus;
@@ -82,7 +83,14 @@ public class ConsentService {
 
                     repository.save(application);
                 })
-                .doOnError(WebClientResponseException.class, ex -> log.error("Accreditation of archive reference: {} - {}", application.getArchiveReference(), ex.getResponseBodyAsString()))
+                .doOnError(AltinnException.class, ex -> {
+                    if (ex.getErrorCode().getCode() == 1004) {
+                        application.setStatus(AltinnApplicationStatus.CONSENTS_INVALID_SUBJECT);
+                        repository.save(application);
+                    }
+
+                    log.error("Accreditation of archive reference: {} - {}", application.getArchiveReference(), ex.getErrorCode());
+                })
                 .subscribe();
     }
 
