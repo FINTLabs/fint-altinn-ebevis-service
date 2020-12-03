@@ -2,6 +2,7 @@ package no.fint.ebevis.service;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fint.ebevis.client.DataAltinnClient;
+import no.fint.ebevis.exception.AltinnException;
 import no.fint.ebevis.factory.ConsentFactory;
 import no.fint.ebevis.model.AltinnApplication;
 import no.fint.ebevis.model.ConsentStatus;
@@ -10,7 +11,6 @@ import no.fint.ebevis.model.ebevis.*;
 import no.fint.ebevis.repository.AltinnApplicationRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
@@ -82,13 +82,18 @@ public class ConsentService {
 
                     repository.save(application);
                 })
-                .doOnError(WebClientResponseException.class, ex -> log.error("Accreditation of archive reference: {} - {}", application.getArchiveReference(), ex.getResponseBodyAsString()))
+                .doOnError(AltinnException.class, ex -> {
+                    handleAltinnError(application, ex.getErrorCode());
+                    log.error("Accreditation of archive reference: {} - {}", application.getArchiveReference(), ex.getErrorCode());
+                })
                 .subscribe();
     }
 
     public void updateStatuses() {
         client.getAccreditations(lastUpdated)
                 .doOnSuccess(accreditations -> {
+                    lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+
                     List<String> ids = accreditations.stream().map(Accreditation::getId).collect(Collectors.toList());
 
                     List<AltinnApplication> applications =
@@ -98,10 +103,9 @@ public class ConsentService {
 
                     Flux.fromIterable(applications)
                             .delayElements(Duration.ofSeconds(1))
-                            .doOnComplete(() -> lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC))
                             .subscribe(this::updateStatus);
                 })
-                .doOnError(WebClientResponseException.class, ex -> log.error(ex.getResponseBodyAsString()))
+                .doOnError(AltinnException.class, ex -> log.error("Accreditations last updated: {}", ex.getErrorCode()))
                 .subscribe();
     }
 
@@ -111,7 +115,10 @@ public class ConsentService {
                     updateConsentStatuses(application, statuses);
                     repository.save(application);
                 })
-                .doOnError(WebClientResponseException.class, ex -> log.error(ex.getResponseBodyAsString()))
+                .doOnError(AltinnException.class, ex -> {
+                    lastUpdated = OffsetDateTime.parse("1970-01-01T00:00:00Z");
+                    log.error("Status of archive reference: {} - {}", application.getArchiveReference(), ex.getErrorCode());
+                })
                 .subscribe();
     }
 
@@ -148,7 +155,10 @@ public class ConsentService {
                                 repository.save(application);
                             });
                 })
-                .doOnError(WebClientResponseException.class, ex -> log.error("Reminder of archive reference: {} - {}", application.getArchiveReference(), ex.getResponseBodyAsString()))
+                .doOnError(AltinnException.class, ex -> {
+                    handleAltinnError(application, ex.getErrorCode());
+                    log.error("Reminder of archive reference: {} - {}", application.getArchiveReference(), ex.getErrorCode());
+                })
                 .subscribe();
     }
 
@@ -203,4 +213,21 @@ public class ConsentService {
     private final Predicate<Collection<AltinnApplication.Consent>> isCanceled = consents ->
             !consents.isEmpty() && consents.stream().map(AltinnApplication.Consent::getStatus).anyMatch(status ->
                     status.equals(ConsentStatus.CONSENT_REJECTED) || status.equals(ConsentStatus.CONSENT_EXPIRED));
+
+    private void handleAltinnError(AltinnApplication application, ErrorCode errorCode) {
+        Optional.ofNullable(errorCode).map(ErrorCode::getCode).ifPresent(code -> {
+            switch (code) {
+                case 1004:
+                    application.setStatus(AltinnApplicationStatus.CONSENTS_INVALID_SUBJECT);
+                    repository.save(application);
+                    break;
+                case 1019:
+                    application.setAccreditationDate(OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC));
+                    repository.save(application);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
 }
