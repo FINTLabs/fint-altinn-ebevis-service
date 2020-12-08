@@ -1,6 +1,6 @@
 package no.fint.ebevis.factory
 
-import no.fint.ebevis.model.AltinnApplication
+import no.fint.altinn.model.AltinnApplication
 import spock.lang.Specification
 
 class ConsentFactorySpec extends Specification {

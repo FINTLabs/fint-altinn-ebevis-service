@@ -1,11 +1,11 @@
 package no.fint.ebevis.util
 
-import no.fint.ebevis.model.ebevis.Authorization
-import no.fint.ebevis.model.ebevis.EvidenceParameter
-import no.fint.ebevis.model.ebevis.EvidenceRequest
-import no.fint.ebevis.model.ebevis.LegalBasis
-import no.fint.ebevis.model.ebevis.vocab.ParamType
-import no.fint.ebevis.model.ebevis.vocab.Type
+import no.fint.altinn.model.ebevis.Authorization
+import no.fint.altinn.model.ebevis.EvidenceParameter
+import no.fint.altinn.model.ebevis.EvidenceRequest
+import no.fint.altinn.model.ebevis.LegalBasis
+import no.fint.altinn.model.ebevis.vocab.ParamType
+import no.fint.altinn.model.ebevis.vocab.Type
 
 import java.time.OffsetDateTime
 

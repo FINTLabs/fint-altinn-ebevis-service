@@ -1,17 +1,17 @@
 package no.fint.ebevis.service
 
+import no.fint.altinn.model.AltinnApplication
+import no.fint.altinn.model.AltinnApplicationStatus
+import no.fint.altinn.model.ConsentStatus
+import no.fint.altinn.model.ebevis.Accreditation
+import no.fint.altinn.model.ebevis.Authorization
+import no.fint.altinn.model.ebevis.ErrorCode
+import no.fint.altinn.model.ebevis.EvidenceCode
+import no.fint.altinn.model.ebevis.EvidenceStatus
+import no.fint.altinn.model.ebevis.EvidenceStatusCode
+import no.fint.altinn.model.ebevis.Notification
 import no.fint.ebevis.client.DataAltinnClient
 import no.fint.ebevis.exception.AltinnException
-import no.fint.ebevis.model.AltinnApplication
-import no.fint.ebevis.model.ConsentStatus
-import no.fint.ebevis.model.AltinnApplicationStatus
-import no.fint.ebevis.model.ebevis.Accreditation
-import no.fint.ebevis.model.ebevis.Authorization
-import no.fint.ebevis.model.ebevis.ErrorCode
-import no.fint.ebevis.model.ebevis.EvidenceCode
-import no.fint.ebevis.model.ebevis.EvidenceStatus
-import no.fint.ebevis.model.ebevis.EvidenceStatusCode
-import no.fint.ebevis.model.ebevis.Notification
 import no.fint.ebevis.repository.AltinnApplicationRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

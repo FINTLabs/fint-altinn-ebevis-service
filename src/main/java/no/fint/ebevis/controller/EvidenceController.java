@@ -1,10 +1,10 @@
 package no.fint.ebevis.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.altinn.model.ebevis.ErrorCode;
+import no.fint.altinn.model.ebevis.Evidence;
 import no.fint.ebevis.client.DataAltinnClient;
 import no.fint.ebevis.exception.AltinnException;
-import no.fint.ebevis.model.ebevis.ErrorCode;
-import no.fint.ebevis.model.ebevis.Evidence;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;

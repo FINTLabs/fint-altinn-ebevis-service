@@ -1,7 +1,7 @@
 package no.fint.ebevis.repository
 
-import no.fint.ebevis.model.AltinnApplication
-import no.fint.ebevis.model.AltinnApplicationStatus
+import no.fint.altinn.model.AltinnApplication
+import no.fint.altinn.model.AltinnApplicationStatus
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import spock.lang.Specification
