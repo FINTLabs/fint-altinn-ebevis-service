@@ -1,7 +1,7 @@
 package no.fint.ebevis.exception;
 
 import lombok.Getter;
-import no.fint.ebevis.model.ebevis.ErrorCode;
+import no.fint.altinn.model.ebevis.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 @Getter

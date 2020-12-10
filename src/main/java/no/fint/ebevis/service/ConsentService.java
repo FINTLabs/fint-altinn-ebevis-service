@@ -1,13 +1,13 @@
 package no.fint.ebevis.service;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.altinn.model.AltinnApplication;
+import no.fint.altinn.model.AltinnApplicationStatus;
+import no.fint.altinn.model.ConsentStatus;
+import no.fint.altinn.model.ebevis.*;
 import no.fint.ebevis.client.DataAltinnClient;
 import no.fint.ebevis.exception.AltinnException;
 import no.fint.ebevis.factory.ConsentFactory;
-import no.fint.ebevis.model.AltinnApplication;
-import no.fint.ebevis.model.ConsentStatus;
-import no.fint.ebevis.model.AltinnApplicationStatus;
-import no.fint.ebevis.model.ebevis.*;
 import no.fint.ebevis.repository.AltinnApplicationRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -92,14 +92,14 @@ public class ConsentService {
     public void updateStatuses() {
         client.getAccreditations(lastUpdated)
                 .doOnSuccess(accreditations -> {
-                    lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
-
                     List<String> ids = accreditations.stream().map(Accreditation::getId).collect(Collectors.toList());
 
                     List<AltinnApplication> applications =
                             repository.findAllByStatusInAndAccreditationIdIn(Arrays.asList(AltinnApplicationStatus.CONSENTS_REQUESTED, AltinnApplicationStatus.CONSENTS_ACCEPTED), ids);
 
                     log.info("Found {} application(s) with new consent status since {}.", applications.size(), lastUpdated.toString());
+
+                    lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
 
                     Flux.fromIterable(applications)
                             .delayElements(Duration.ofSeconds(1))

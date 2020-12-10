@@ -1,8 +1,8 @@
 package no.fint.ebevis.factory;
 
-import no.fint.ebevis.model.AltinnApplication;
-import no.fint.ebevis.model.ebevis.Authorization;
-import no.fint.ebevis.model.ebevis.EvidenceRequest;
+import no.fint.altinn.model.AltinnApplication;
+import no.fint.altinn.model.ebevis.Authorization;
+import no.fint.altinn.model.ebevis.EvidenceRequest;
 
 import java.util.ArrayList;
 import java.util.List;

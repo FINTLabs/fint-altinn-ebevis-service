@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import no.fint.altinn.model.ebevis.Accreditation
+import no.fint.altinn.model.ebevis.ErrorCode
+import no.fint.altinn.model.ebevis.Evidence
 import no.fint.ebevis.configuration.AltinnProperties
-import no.fint.ebevis.model.ebevis.Accreditation
-import no.fint.ebevis.model.ebevis.ErrorCode
-import no.fint.ebevis.model.ebevis.Evidence
 import no.fint.ebevis.util.MediaTypeSerializer
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer

@@ -1,9 +1,9 @@
 package no.fint.ebevis.client;
 
+import no.fint.altinn.model.ebevis.ErrorCode;
+import no.fint.altinn.model.ebevis.EvidenceCode;
+import no.fint.altinn.model.ebevis.EvidenceStatusCode;
 import no.fint.ebevis.configuration.AltinnProperties;
-import no.fint.ebevis.model.ebevis.ErrorCode;
-import no.fint.ebevis.model.ebevis.EvidenceCode;
-import no.fint.ebevis.model.ebevis.EvidenceStatusCode;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;

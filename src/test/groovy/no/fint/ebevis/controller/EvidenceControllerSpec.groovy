@@ -1,9 +1,9 @@
 package no.fint.ebevis.controller
 
+import no.fint.altinn.model.ebevis.ErrorCode
+import no.fint.altinn.model.ebevis.Evidence
 import no.fint.ebevis.client.DataAltinnClient
 import no.fint.ebevis.exception.AltinnException
-import no.fint.ebevis.model.ebevis.ErrorCode
-import no.fint.ebevis.model.ebevis.Evidence
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest

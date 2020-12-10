@@ -2,8 +2,8 @@ package no.fint.ebevis.configuration;
 
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import no.fint.altinn.model.ebevis.ErrorCode;
 import no.fint.ebevis.exception.AltinnException;
-import no.fint.ebevis.model.ebevis.ErrorCode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ClientHttpConnector;

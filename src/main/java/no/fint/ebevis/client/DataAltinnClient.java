@@ -1,6 +1,6 @@
 package no.fint.ebevis.client;
 
-import no.fint.ebevis.model.ebevis.*;
+import no.fint.altinn.model.ebevis.*;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
