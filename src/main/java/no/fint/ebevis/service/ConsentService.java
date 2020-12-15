@@ -151,7 +151,7 @@ public class ConsentService {
                             .findFirst()
                             .ifPresent(notification -> {
                                 application.setAccreditationDate(notification.getDate());
-                                application.setAccreditationCount(notification.getRecipientCount());
+                                application.setAccreditationCount(application.getAccreditationCount() + 1);
                                 repository.save(application);
                             });
                 })

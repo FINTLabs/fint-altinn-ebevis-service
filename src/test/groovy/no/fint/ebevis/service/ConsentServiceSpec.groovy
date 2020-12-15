@@ -142,8 +142,8 @@ class ConsentServiceSpec extends Specification {
 
     def "sendReminder sends reminder"() {
         given:
-        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, accreditationId: 'id')
-        def notification = new Notification(success: true, recipientCount: 1, date: OffsetDateTime.parse('2000-01-01T00:00:00Z'))
+        def application = new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED, accreditationId: 'id', accreditationCount: 0)
+        def notification = new Notification(success: true, date: OffsetDateTime.parse('2000-01-01T00:00:00Z'))
 
         when:
         service.sendReminder(application)
