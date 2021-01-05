@@ -47,7 +47,6 @@ class DataAltinnClientSpec extends Specification {
         mockWebServer.enqueue(new MockResponse()
                 .setBody(objectMapper.writeValueAsString(accreditation))
                 .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .addHeader(HttpHeaders.LOCATION, 'location')
                 .setResponseCode(HttpStatus.CREATED.value()))
 
         when:
@@ -55,11 +54,7 @@ class DataAltinnClientSpec extends Specification {
 
         then:
         StepVerifier.create(setup)
-                .expectNextMatches({ responseEntity ->
-                    responseEntity.statusCode == HttpStatus.CREATED &&
-                            responseEntity.headers.getLocation() == URI.create('location') &&
-                            responseEntity.body == accreditation
-                })
+                .expectNext(accreditation)
                 .verifyComplete()
     }
 
