@@ -54,11 +54,7 @@ public class EvidenceService {
 
     private Mono<AltinnApplication> update(AltinnApplication application) {
         return client.getEvidenceStatuses(application.getAccreditationId())
-                .flatMap(evidenceStatuses -> {
-                    updateEvidenceStatus(application, evidenceStatuses);
-
-                    return Mono.just(application);
-                })
+                .map(evidenceStatuses -> updateEvidenceStatus(application, evidenceStatuses))
                 .doOnError(AltinnException.class, ex -> {
                     log.error("Status of archive reference: {} - {}", application.getArchiveReference(), ex.getErrorCode());
 
@@ -66,7 +62,7 @@ public class EvidenceService {
                 });
     }
 
-    private void updateEvidenceStatus(AltinnApplication application, List<EvidenceStatus> statuses) {
+    private AltinnApplication updateEvidenceStatus(AltinnApplication application, List<EvidenceStatus> statuses) {
         statuses.forEach(status -> Optional.ofNullable(status)
                 .map(EvidenceStatus::getStatus)
                 .map(EvidenceStatusCode::getCode)
@@ -102,12 +98,13 @@ public class EvidenceService {
 
         if (isAccepted.test(consents)) {
             application.setStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED);
-            return;
         }
 
         if (isCanceled.test(consents)) {
             application.setStatus(AltinnApplicationStatus.CONSENTS_REJECTED_OR_EXPIRED);
         }
+
+        return application;
     }
 
     private final Predicate<Collection<AltinnApplication.Consent>> isAccepted = consents ->
