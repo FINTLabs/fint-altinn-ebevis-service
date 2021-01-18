@@ -19,13 +19,13 @@ public class DataAltinnClient {
         this.webClient = webClient;
     }
 
-    public Mono<ResponseEntity<Accreditation>> createAccreditation(Authorization authorization) {
+    public Mono<Accreditation> createAccreditation(Authorization authorization) {
         return webClient.post()
                 .uri("/authorization")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(authorization)
                 .retrieve()
-                .toEntity(Accreditation.class);
+                .bodyToMono(Accreditation.class);
     }
 
     public Mono<List<Notification>> createReminder(String accreditationId) {
