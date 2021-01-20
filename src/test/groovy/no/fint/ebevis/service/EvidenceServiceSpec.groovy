@@ -76,7 +76,7 @@ class EvidenceServiceSpec extends Specification {
         given:
         repository.saveAll([new AltinnApplication(requestor: '1', subject: '1', archiveReference: '1', status: AltinnApplicationStatus.CONSENTS_REQUESTED,
                 accreditationId: '1', accreditationDate: OffsetDateTime.parse('2000-01-01T00:00:00Z'), accreditationCount: 0),
-                            new AltinnApplication(requestor: '2', subject: '2', archiveReference: '2', status: AltinnApplicationStatus.CONSENTS_REQUESTED,
+                            new AltinnApplication(requestor: '2', subject: '2', archiveReference: '2', status: AltinnApplicationStatus.CONSENTS_ACCEPTED,
                                     accreditationId: '2', accreditationDate: OffsetDateTime.parse('2000-01-01T00:00:00Z'), accreditationCount: 0)])
 
         2 * client.getEvidenceStatuses(_ as String) >>> [Mono.error(new AltinnException(HttpStatus.INTERNAL_SERVER_ERROR, new ErrorCode(code: 1003, description: 'description'))),
