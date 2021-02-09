@@ -8,11 +8,13 @@ public class SchedulingService {
     private final AccreditationService accreditationService;
     private final EvidenceService evidenceService;
     private final ReminderService reminderService;
+    private final ExpiredService expiredService;
 
-    public SchedulingService(AccreditationService accreditationService, EvidenceService evidenceService, ReminderService reminderService) {
+    public SchedulingService(AccreditationService accreditationService, EvidenceService evidenceService, ReminderService reminderService, ExpiredService expiredService) {
         this.accreditationService = accreditationService;
         this.evidenceService = evidenceService;
         this.reminderService = reminderService;
+        this.expiredService = expiredService;
     }
 
     @Scheduled(initialDelayString = "${scheduling.initial-delay}", fixedDelayString = "${scheduling.fixed-delay}")
@@ -20,6 +22,7 @@ public class SchedulingService {
         accreditationService.createAccreditations()
                 .concatWith(evidenceService.updateEvidence())
                 .concatWith(reminderService.sendReminders())
+                .concatWith(expiredService.setExpired())
                 .subscribe();
     }
 }
