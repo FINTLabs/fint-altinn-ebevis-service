@@ -12,11 +12,15 @@ class AltinnApplicationRepositorySpec extends Specification {
     @Autowired
     AltinnApplicationRepository repository
 
+    void cleanup() {
+        repository.deleteAll()
+    }
+
     def "findAllByStatus() returns documents given status"() {
         given:
-        repository.saveAll(Arrays.asList(new AltinnApplication(status: AltinnApplicationStatus.NEW),
+        repository.saveAll([new AltinnApplication(status: AltinnApplicationStatus.NEW),
                 new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED),
-                new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED)))
+                new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED)])
 
         when:
         def documents = repository.findAllByStatus(AltinnApplicationStatus.NEW)
@@ -25,13 +29,25 @@ class AltinnApplicationRepositorySpec extends Specification {
         documents.size() == 1
     }
 
+    def "findAllByStatusIn() returns documents given status"() {
+        given:
+        repository.saveAll([new AltinnApplication(status: AltinnApplicationStatus.NEW),
+                new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_REQUESTED),
+                new AltinnApplication(status: AltinnApplicationStatus.CONSENTS_ACCEPTED)])
+
+        when:
+        def documents = repository.findAllByStatusIn([AltinnApplicationStatus.CONSENTS_REQUESTED, AltinnApplicationStatus.CONSENTS_ACCEPTED])
+
+        then:
+        documents.size() == 2
+    }
+
     def "findAllByStatusInAndAccreditationIdIn() returns documents given status"() {
         given:
-        repository.saveAll(Arrays.asList(
-                new AltinnApplication(accreditationId: 'id1', status: AltinnApplicationStatus.CONSENTS_REQUESTED),
+        repository.saveAll([new AltinnApplication(accreditationId: 'id1', status: AltinnApplicationStatus.CONSENTS_REQUESTED),
                 new AltinnApplication(accreditationId: 'id2', status: AltinnApplicationStatus.CONSENTS_ACCEPTED),
                 new AltinnApplication(accreditationId: 'id3', status: AltinnApplicationStatus.ARCHIVED),
-                new AltinnApplication(accreditationId: 'id4', status: AltinnApplicationStatus.PURGED)))
+                new AltinnApplication(accreditationId: 'id4', status: AltinnApplicationStatus.PURGED)])
 
         when:
         def documents = repository.findAllByStatusInAndAccreditationIdIn([AltinnApplicationStatus.CONSENTS_REQUESTED, AltinnApplicationStatus.CONSENTS_ACCEPTED], ['id1','id2'])
