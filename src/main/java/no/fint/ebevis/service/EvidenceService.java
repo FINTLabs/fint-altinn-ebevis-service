@@ -25,7 +25,8 @@ import java.util.function.Predicate;
 public class EvidenceService {
     private final DataAltinnClient client;
     private final AltinnApplicationRepository repository;
-    private final EnumSet<AltinnApplicationStatus> validStatuses = EnumSet.of(AltinnApplicationStatus.CONSENTS_REQUESTED, AltinnApplicationStatus.CONSENTS_ACCEPTED);
+    private final EnumSet<AltinnApplicationStatus> validStatuses = EnumSet.of(AltinnApplicationStatus.CONSENTS_REQUESTED,
+            AltinnApplicationStatus.CONSENTS_ACCEPTED);
 
     private OffsetDateTime lastUpdated = OffsetDateTime.parse("1970-01-01T00:00:00Z");
 
@@ -37,8 +38,11 @@ public class EvidenceService {
     public Flux<AltinnApplication> updateEvidence() {
         return client.getAccreditations(lastUpdated)
                 .flatMapIterable(accreditations -> {
-                    log.info("Found {} accreditation(s) with new consent status since {}.", accreditations.size(), lastUpdated);
-                    lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+                    log.info("Found {} accreditation(s) with new consent status since {}.",
+                            accreditations.size(), lastUpdated);
+                    if (!accreditations.isEmpty()) {
+                        lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+                    }
                     return accreditations;
                 })
                 .delayElements(Duration.ofMillis(1000))
