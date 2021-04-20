@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import no.fint.altinn.model.AltinnApplication;
 import no.fint.altinn.model.AltinnApplicationStatus;
 import no.fint.altinn.model.ConsentStatus;
-import no.fint.altinn.model.ebevis.*;
+import no.fint.altinn.model.ebevis.Accreditation;
+import no.fint.altinn.model.ebevis.EvidenceStatus;
+import no.fint.altinn.model.ebevis.EvidenceStatusCode;
 import no.fint.ebevis.client.DataAltinnClient;
 import no.fint.ebevis.exception.AltinnException;
 import no.fint.ebevis.repository.AltinnApplicationRepository;
@@ -17,13 +19,13 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class EvidenceService {
     private final DataAltinnClient client;
     private final AltinnApplicationRepository repository;
+    private final EnumSet<AltinnApplicationStatus> validStatuses = EnumSet.of(AltinnApplicationStatus.CONSENTS_REQUESTED, AltinnApplicationStatus.CONSENTS_ACCEPTED);
 
     private OffsetDateTime lastUpdated = OffsetDateTime.parse("1970-01-01T00:00:00Z");
 
@@ -35,21 +37,20 @@ public class EvidenceService {
     public Flux<AltinnApplication> updateEvidence() {
         return client.getAccreditations(lastUpdated)
                 .flatMapIterable(accreditations -> {
-                    List<String> ids = accreditations.stream().map(Accreditation::getId).collect(Collectors.toList());
-
-                    List<AltinnApplication> applications = repository.findAllByStatusInAndAccreditationIdIn(Arrays.asList(AltinnApplicationStatus.CONSENTS_REQUESTED, AltinnApplicationStatus.CONSENTS_ACCEPTED), ids);
-
-                    log.info("Found {} application(s) with new consent status since {}.", applications.size(), lastUpdated.toString());
-
+                    log.info("Found {} accreditation(s) with new consent status since {}.", accreditations.size(), lastUpdated);
                     lastUpdated = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
-
-                    return applications;
+                    return accreditations;
                 })
                 .delayElements(Duration.ofMillis(1000))
+                .flatMap(this::retrieve)
+                .filter(it -> validStatuses.contains(it.getStatus()))
                 .flatMap(this::update)
-                .onErrorContinue((a, b) -> {
-                })
+                .onErrorContinue((a, b) -> log.debug("Error: {}, {}", a, b))
                 .doOnNext(repository::save);
+    }
+
+    private Flux<AltinnApplication> retrieve(Accreditation accreditation) {
+        return Flux.fromIterable(repository.findAllByAccreditationId(accreditation.getId()));
     }
 
     private Mono<AltinnApplication> update(AltinnApplication application) {
@@ -57,12 +58,12 @@ public class EvidenceService {
                 .map(evidenceStatuses -> updateEvidenceStatus(application, evidenceStatuses))
                 .doOnError(AltinnException.class, ex -> {
                     log.error("Status of archive reference: {} - {}", application.getArchiveReference(), ex.getErrorCode());
-
                     lastUpdated = OffsetDateTime.parse("1970-01-01T00:00:00Z");
                 });
     }
 
     private AltinnApplication updateEvidenceStatus(AltinnApplication application, List<EvidenceStatus> statuses) {
+        log.debug("{}, {}: {}", application.getArchiveReference(), application.getAccreditationId(), statuses);
         statuses.forEach(status -> Optional.ofNullable(status)
                 .map(EvidenceStatus::getStatus)
                 .map(EvidenceStatusCode::getCode)
@@ -108,7 +109,7 @@ public class EvidenceService {
     }
 
     private final Predicate<Collection<AltinnApplication.Consent>> isAccepted = consents ->
-            !consents.isEmpty() && (consents.stream().map(AltinnApplication.Consent::getStatus).allMatch(ConsentStatus.CONSENT_ACCEPTED::equals) ||
+            !consents.isEmpty() && (consents.stream().map(AltinnApplication.Consent::getStatus).allMatch(ConsentStatus.CONSENT_ACCEPTED::equals) || // TODO BUG: Why not && ?
                     consents.stream().map(AltinnApplication.Consent::getDocumentId).allMatch(Objects::nonNull));
 
     private final Predicate<Collection<AltinnApplication.Consent>> isCanceled = consents ->
