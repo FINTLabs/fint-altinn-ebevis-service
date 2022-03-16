@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ConsentFactory {
     public static final String BANKRUPTCY = "KonkursDrosje";
-    public static final String ARREARS = "RestanserDrosje";
+    public static final String ARREARS = "RestanserV2";
 
     public static Authorization ofTaxiLicenseApplication(AltinnApplication application) {
         Authorization authorization = new Authorization();
