@@ -7,3 +7,9 @@ altinn:
   ocp-apim-subscription-key:
   key-store-password:
   key-store-file:
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, shutdown, prometheus

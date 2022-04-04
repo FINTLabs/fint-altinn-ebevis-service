@@ -1,6 +1,6 @@
 plugins {
 	id 'org.springframework.boot' version '2.3.4.RELEASE'
-	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 	id 'groovy'
 }
@@ -24,6 +24,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation('org.springframework.boot:spring-boot-starter-actuator')
+	implementation('io.micrometer:micrometer-registry-prometheus')
 	implementation 'no.fint:fint-altinn-model:1.0.1'
 
 	compileOnly 'org.projectlombok:lombok'
