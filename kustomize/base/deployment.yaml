@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: altinn-ebevis-service
+spec:
+  selector:
+    matchLabels:
+      app: altinn-ebevis-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxSurge: 1, maxUnavailable: 0}
+  template:
+    metadata:
+      labels:
+        app: altinn-ebevis-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "actuator/prometheus"
+    spec:
+      volumes:
+        - name: credentials
+          secret:
+            secretName: altinn-ebevis-sertificate
+      containers:
+        - name: altinn-ebevis-service
+          image: fintlabsacr.azurecr.io/fint-altinn-ebevis-service:latest
+          volumeMounts:
+            - name: credentials
+              mountPath: /credentials
+          resources:
+            limits:
+              memory: "2G"
+              cpu: "500m"
+            requests:
+              memory: "1G"
+              cpu: "250m"
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          envFrom:
+            - secretRef:
+                name: altinn-ebevis-service
+          env:
+            - {name: TZ, value: Europe/Oslo}
+            - {name: JAVA_TOOL_OPTIONS, value: '-Xmx1G -XX:+ExitOnOutOfMemoryError'}
+            - {name: altinn.base-url, value: 'https://apim-nadobe-staging.azure-api.net/v1'}
+            - {name: scheduling.initial-delay, value: '30000'}
+            - {name: scheduling.fixed-delay, value: '600000'}
+            - {name: altinn.key-store-file, value: '/credentials/altinn-test.p12'}
+            - {name: logging.level.no.fint, value: 'info'}

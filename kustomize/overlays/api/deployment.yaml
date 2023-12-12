@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: altinn-ebevis-service
+spec:
+  template:
+    spec:
+      volumes:
+        - name: credentials
+          secret:
+            secretName: vigo-virksomhetssertifikat
+      containers:
+        - name: altinn-ebevis-service
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: "500m"
+            requests:
+              memory: "3Gi"
+              cpu: "250m"
+          env:
+            - {name: JAVA_TOOL_OPTIONS, value: '-Xmx3G -XX:+ExitOnOutOfMemoryError'}
+            - {name: altinn.base-url, value: 'https://apim-nadobe-prod.azure-api.net/v1'}
+            - {name: scheduling.initial-delay, value: '30000'}
+            - {name: scheduling.fixed-delay, value: '60000'}
+            - {name: altinn.key-store-file, value: '/credentials/vigo.p12'}
+            - {name: logging.level.no.fint, value: 'info'}
