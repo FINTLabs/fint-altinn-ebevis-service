@@ -1,5 +1,6 @@
 package no.fint.ebevis.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
@@ -29,7 +30,7 @@ public class MaskinportenConfiguration {
     @Bean
     public String makeTokenRequest() {
         try {
-            return WebClient.builder().baseUrl(maskinportenProperties.getTokenEndpoint()).build()
+            String json = WebClient.builder().baseUrl(maskinportenProperties.getTokenEndpoint()).build()
                     .post()
                     .body(BodyInserters
                             .fromFormData("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
@@ -39,6 +40,9 @@ public class MaskinportenConfiguration {
                     .onErrorMap(e -> new RuntimeException("Feil under henting av token", e))
                     .block();
 
+            TokenResponse tokenResponse = new ObjectMapper().readValue(json, TokenResponse.class);
+
+            return tokenResponse.getAccess_token();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -71,4 +75,7 @@ public class MaskinportenConfiguration {
         return signedJWT.serialize();
     }
 
+
+
 }
+
