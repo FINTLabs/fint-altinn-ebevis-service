@@ -5,8 +5,17 @@ scheduling:
 altinn:
   base-url: https://api.data.altinn.no/v1
   ocp-apim-subscription-key:
-  key-store-password:
-  key-store-file:
+
+maskinporten:
+  token-endpoint: https://test.maskinporten.no/token
+  audience: https://test.maskinporten.no/
+  scope:
+  issuer:
+  kid:
+  private-key:
+
+server:
+  port : 8081
 
 management:
   endpoints:

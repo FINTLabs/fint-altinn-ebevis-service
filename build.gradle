@@ -26,6 +26,8 @@ dependencies {
 	implementation('io.micrometer:micrometer-registry-prometheus')
 	implementation 'no.fint:fint-altinn-model:1.0.2'
 
+	implementation 'com.nimbusds:nimbus-jose-jwt:9.37'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
