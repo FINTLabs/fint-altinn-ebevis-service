@@ -1,15 +1,25 @@
 package no.fint.ebevis.configuration;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class TokenResponse {
-    private String access_token;
-    private String token_type;
-    private int expires_in;
+
+    @NonNull
+    @JsonProperty("access_token")
+    private String accessToken;
+
+    @JsonProperty("token_type")
+    private String tokenType;
+
+    @JsonProperty("expires_in")
+    private int expiresIn;
+
     private String scope;
 }

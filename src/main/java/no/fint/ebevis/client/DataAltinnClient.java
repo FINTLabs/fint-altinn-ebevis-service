@@ -1,6 +1,7 @@
 package no.fint.ebevis.client;
 
 import no.fint.altinn.model.ebevis.*;
+import no.fint.ebevis.configuration.MaskinportenConfiguration;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,55 +15,64 @@ import java.util.List;
 @Component
 public class DataAltinnClient {
     private final WebClient webClient;
+    private final MaskinportenConfiguration maskinporten;
 
-    public DataAltinnClient(WebClient webClient) {
+    public DataAltinnClient(WebClient webClient, MaskinportenConfiguration maskinporten) {
         this.webClient = webClient;
+        this.maskinporten = maskinporten;
     }
 
     public Mono<Accreditation> createAccreditation(Authorization authorization) {
-        return webClient.post()
+        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.post()
                 .uri("/authorization")
+                .header("Authorization", "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(authorization)
                 .retrieve()
-                .bodyToMono(Accreditation.class);
+                .bodyToMono(Accreditation.class));
     }
 
     public Mono<List<Notification>> createReminder(String accreditationId) {
-        return webClient.post()
+        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.post()
                 .uri("/accreditations/{accreditationId}/reminders", accreditationId)
+                .header("Authorization", "Bearer " + accessToken)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Notification>>() {});
+                .bodyToMono(new ParameterizedTypeReference<List<Notification>>() {}));
     }
 
     public Mono<ResponseEntity<Void>> deleteAccreditation(String accreditationId) {
-        return webClient.delete()
+        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.delete()
                 .uri("/accreditations/{accreditationId}", accreditationId)
+                .header("Authorization", "Bearer " + accessToken)
                 .retrieve()
-                .toBodilessEntity();
+                .toBodilessEntity());
     }
 
     public Mono<List<Accreditation>> getAccreditations(OffsetDateTime changedAfter) {
-        return webClient.get()
+        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/accreditations")
                         .queryParam("changedafter", changedAfter)
                         .build())
+                .header("Authorization", "Bearer " + accessToken)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Accreditation>>() {});
+                .bodyToMono(new ParameterizedTypeReference<List<Accreditation>>() {}));
     }
 
     public Mono<Evidence> getEvidence(String accreditationId, String evidenceCode) {
-        return webClient.get()
-                .uri("/evidence/{accreditationId}/{evidenceCode}", accreditationId, evidenceCode)
-                .retrieve()
-                .bodyToMono(Evidence.class);
+        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.get()
+                    .uri("/evidence/{accreditationId}/{evidenceCode}", accreditationId, evidenceCode)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .bodyToMono(Evidence.class));
     }
 
     public Mono<List<EvidenceStatus>> getEvidenceStatuses(String id) {
-        return webClient.get()
+        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.get()
                 .uri("/evidence/{id}", id)
+                .header("Authorization", "Bearer " + accessToken)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatus>>() {});
+                .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatus>>() {}));
     }
+
 }

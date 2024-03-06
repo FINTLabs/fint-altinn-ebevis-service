@@ -4,8 +4,10 @@ import no.fint.altinn.model.ebevis.ErrorCode;
 import no.fint.ebevis.exception.AltinnException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.reactive.ClientHttpConnector;
-import org.springframework.web.reactive.function.client.*;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
@@ -13,24 +15,19 @@ import java.util.function.Function;
 @Configuration
 public class AltinnSecurityConfiguration {
     private final AltinnProperties altinnProperties;
-    private final MaskinportenConfiguration maskinportenConfiguration;
 
-    public AltinnSecurityConfiguration(AltinnProperties altinnProperties, MaskinportenConfiguration maskinportenConfiguration) {
+    public AltinnSecurityConfiguration(AltinnProperties altinnProperties) {
         this.altinnProperties = altinnProperties;
-        this.maskinportenConfiguration = maskinportenConfiguration;
     }
 
     @Bean
-    public WebClient webClient(WebClient.Builder builder, ClientHttpConnector clientHttpConnector) {
+    public WebClient webClient(WebClient.Builder builder) {
         ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
                 .build();
 
-        String token = maskinportenConfiguration.makeTokenRequest();
-
         return builder
                 .defaultHeader("Ocp-apim-subscription-key", altinnProperties.getOcpApimSubscriptionKey())
-                .defaultHeader("Authorization", "Bearer " + token)
                 .baseUrl(altinnProperties.getBaseUrl())
                 .filter(ExchangeFilterFunction.ofResponseProcessor(onError))
                 .exchangeStrategies(exchangeStrategies)

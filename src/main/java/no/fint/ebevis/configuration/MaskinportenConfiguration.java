@@ -1,21 +1,22 @@
 package no.fint.ebevis.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import org.springframework.context.annotation.Bean;
+import jdk.nashorn.internal.parser.Token;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Clock;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 @Configuration
@@ -27,28 +28,25 @@ public class MaskinportenConfiguration {
         this.maskinportenProperties = maskinportenProperties;
     }
 
-    @Bean
-    public String makeTokenRequest() {
+    public Mono<String> getAccessToken() {
         try {
-            String json = WebClient.builder().baseUrl(maskinportenProperties.getTokenEndpoint()).build()
+
+            return WebClient.builder().baseUrl(maskinportenProperties.getTokenEndpoint()).build()
                     .post()
                     .body(BodyInserters
                             .fromFormData("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
-                            .with("assertion", makeJwt()))
+                            .with("assertion", createSignedJwt()))
                     .retrieve()
-                    .bodyToMono(String.class)
-                    .onErrorMap(e -> new RuntimeException("Feil under henting av token", e))
-                    .block();
+                    .bodyToMono(TokenResponse.class)
+                    .onErrorMap(e -> new RuntimeException("Error fetching token", e))
+                    .flatMap(response -> Mono.just(response.getAccessToken()));
 
-            TokenResponse tokenResponse = new ObjectMapper().readValue(json, TokenResponse.class);
-
-            return tokenResponse.getAccess_token();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String makeJwt() throws Exception {
+    private String createSignedJwt() throws Exception {
 
         JWSHeader jwtHeader = new JWSHeader.Builder(JWSAlgorithm.RS256)
                 .keyID(maskinportenProperties.getKid())
