@@ -24,7 +24,7 @@ spec:
             secretName: altinn-ebevis-sertificate
       containers:
         - name: altinn-ebevis-service
-          image: ghcr.io/fint-altinn-ebevis-service:tba
+          image: ghcr.io/fintlabs/fint-altinn-ebevis-service:tba
           volumeMounts:
             - name: credentials
               mountPath: /credentials
