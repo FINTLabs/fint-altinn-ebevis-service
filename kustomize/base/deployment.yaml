@@ -37,12 +37,6 @@ spec:
               cpu: "250m"
           ports:
             - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 30
-            timeoutSeconds: 5
           envFrom:
             - secretRef:
                 name: altinn-ebevis-service
