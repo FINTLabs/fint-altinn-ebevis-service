@@ -23,9 +23,11 @@ public class DataAltinnClient {
     }
 
     public Mono<Accreditation> createAccreditation(Authorization authorization) {
-        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.post()
+        return maskinporten.getBearerToken().flatMap(bearerToken
+                -> webClient.post()
                 .uri("/authorization")
-                .header("Authorization", "Bearer " + accessToken)
+                .header("Authorization", bearerToken
+                )
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(authorization)
                 .retrieve()
@@ -33,44 +35,52 @@ public class DataAltinnClient {
     }
 
     public Mono<List<Notification>> createReminder(String accreditationId) {
-        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.post()
+        return maskinporten.getBearerToken().flatMap(bearerToken
+                -> webClient.post()
                 .uri("/accreditations/{accreditationId}/reminders", accreditationId)
-                .header("Authorization", "Bearer " + accessToken)
+                .header("Authorization", bearerToken
+                )
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<Notification>>() {}));
     }
 
     public Mono<ResponseEntity<Void>> deleteAccreditation(String accreditationId) {
-        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.delete()
+        return maskinporten.getBearerToken().flatMap(bearerToken
+                -> webClient.delete()
                 .uri("/accreditations/{accreditationId}", accreditationId)
-                .header("Authorization", "Bearer " + accessToken)
+                .header("Authorization", bearerToken
+                )
                 .retrieve()
                 .toBodilessEntity());
     }
 
     public Mono<List<Accreditation>> getAccreditations(OffsetDateTime changedAfter) {
-        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.get()
+        return maskinporten.getBearerToken().flatMap(bearerToken
+                -> webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/accreditations")
                         .queryParam("changedafter", changedAfter)
                         .build())
-                .header("Authorization", "Bearer " + accessToken)
+                .header("Authorization", bearerToken
+                )
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<Accreditation>>() {}));
     }
 
     public Mono<Evidence> getEvidence(String accreditationId, String evidenceCode) {
-        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.get()
+        return maskinporten.getBearerToken().flatMap(bearerToken -> webClient.get()
                     .uri("/evidence/{accreditationId}/{evidenceCode}", accreditationId, evidenceCode)
-                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Authorization", bearerToken)
                     .retrieve()
                     .bodyToMono(Evidence.class));
     }
 
     public Mono<List<EvidenceStatus>> getEvidenceStatuses(String id) {
-        return maskinporten.getAccessToken().flatMap(accessToken -> webClient.get()
+        return maskinporten.getBearerToken().flatMap(bearerToken
+                -> webClient.get()
                 .uri("/evidence/{id}", id)
-                .header("Authorization", "Bearer " + accessToken)
+                .header("Authorization", bearerToken
+                )
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<EvidenceStatus>>() {}));
     }
