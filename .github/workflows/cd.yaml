@@ -40,7 +40,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   deploy-to-aks:
-    name: ${{ matrix.cluster }}
+    name: ${{ matrix.org }}-${{ matrix.cluster }}
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     needs: build-and-publish
@@ -83,7 +83,7 @@ jobs:
         run: |
           {
             echo "## Dry run - not a real deploy"
-            echo "To deploy, merge to ${{ github.event.repository.default_branch }}." 
+            echo "To deploy, merge to ${{ github.event.repository.default_branch }}."
           } >> $GITHUB_STEP_SUMMARY
 
       - name: Get namespace from config file
