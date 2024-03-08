@@ -1,4 +1,4 @@
-FROM gradle:6.7.0-jdk8 as builder
+FROM gradle:8.6-jdk8 as builder
 USER root
 COPY . .
 RUN gradle --no-daemon build

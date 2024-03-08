@@ -15,7 +15,7 @@ class ConsentFactorySpec extends Specification {
         authorization.consentReference == 'archive-reference'
         authorization.evidenceRequests.first().evidenceCodeName == 'KonkursDrosje'
         !authorization.evidenceRequests.first().requestConsent
-        authorization.evidenceRequests.last().evidenceCodeName == 'RestanserDrosje'
+        authorization.evidenceRequests.last().evidenceCodeName == 'RestanserV2'
         authorization.evidenceRequests.last().requestConsent
     }
 }

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.fint.altinn.model.ebevis.Accreditation
 import no.fint.altinn.model.ebevis.Evidence
+import no.fint.ebevis.configuration.MaskinportenConfiguration
+import no.fint.ebevis.configuration.MaskinportenProperties
 import no.fint.ebevis.util.MediaTypeSerializer
 import no.fint.ebevis.util.ObjectFactory
 import okhttp3.mockwebserver.MockResponse
@@ -16,6 +18,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.test.StepVerifier
 import spock.lang.Specification
+import reactor.core.publisher.Mono;
 
 import java.time.OffsetDateTime
 
@@ -32,7 +35,9 @@ class DataAltinnClientSpec extends Specification {
     void setup() {
         mockWebServer.start()
         webClient = WebClient.builder().baseUrl('http://localhost:' + mockWebServer.getPort()).build()
-        dataAltinnClient = new DataAltinnClient(webClient)
+        MaskinportenConfiguration maskinportenConfiguration = Mock()
+        maskinportenConfiguration.getBearerToken() >> Mono.just("Bearer X")
+        dataAltinnClient = new DataAltinnClient(webClient, maskinportenConfiguration)
     }
 
     void cleanup() {
