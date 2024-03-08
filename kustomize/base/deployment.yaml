@@ -18,16 +18,9 @@ spec:
         prometheus.io/port: "8080"
         prometheus.io/path: "actuator/prometheus"
     spec:
-      volumes:
-        - name: credentials
-          secret:
-            secretName: altinn-ebevis-sertificate
       containers:
         - name: altinn-ebevis-service
           image: ghcr.io/fintlabs/fint-altinn-ebevis-service:tba
-          volumeMounts:
-            - name: credentials
-              mountPath: /credentials
           resources:
             limits:
               memory: "2G"

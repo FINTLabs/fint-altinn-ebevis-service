@@ -7,8 +7,8 @@ altinn:
   ocp-apim-subscription-key:
 
 maskinporten:
-  token-endpoint: https://test.maskinporten.no/token
-  audience: https://test.maskinporten.no/
+  token-endpoint:
+  audience:
   scope:
   issuer:
   kid:

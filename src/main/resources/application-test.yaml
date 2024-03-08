@@ -5,8 +5,14 @@ scheduling:
 altinn:
   base-url: https://test-api.data.altinn.no/v1
   ocp-apim-subscription-key:
-  key-store-password:
-  key-store-file:
+
+maskinporten:
+  token-endpoint:
+  audience:
+  scope:
+  issuer:
+  kid:
+  private-key:
 
 management:
   endpoints:

@@ -7,13 +7,6 @@ spec:
     spec:
       containers:
         - name: altinn-ebevis-service
-          resources:
-            limits:
-              memory: "4Gi"
-              cpu: "500m"
-            requests:
-              memory: "3Gi"
-              cpu: "250m"
           env:
             - {name: altinn.base-url, value: 'https://test-api.data.altinn.no/v1'}
             - {name: scheduling.initial-delay, value: '30000'}
