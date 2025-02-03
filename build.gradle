@@ -30,7 +30,7 @@ dependencies {
 	implementation('io.micrometer:micrometer-registry-prometheus')
 	implementation 'no.fint:fint-altinn-model:1.0.2'
 
-	implementation 'com.nimbusds:nimbus-jose-jwt:9.37.3'
+	implementation 'com.nimbusds:nimbus-jose-jwt:9.48'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
