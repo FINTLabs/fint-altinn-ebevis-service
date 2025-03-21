@@ -35,6 +35,11 @@ dependencies {
 	implementation('io.micrometer:micrometer-registry-prometheus')
 	implementation 'no.fint:fint-altinn-model:1.0.2'
 
+	// Azure Cosmos DB server version 3.6 :-(
+	implementation 'org.mongodb:mongodb-driver-sync:5.1.4'
+	implementation 'org.mongodb:mongodb-driver-core:5.1.4'
+	implementation 'org.springframework.data:spring-data-mongodb:4.3.10'
+
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.48'
 
 	compileOnly 'org.projectlombok:lombok'
