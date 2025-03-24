@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '3.4.3'
+	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'java'
 	id 'groovy'
@@ -28,17 +28,22 @@ test {
 	useJUnitPlatform()
 }
 
+
+dependencyManagement {
+	dependencies {
+		// Azure Cosmos DB server version 3.6 :-(
+		dependency 'org.mongodb:mongodb-driver-sync:5.1.4'
+		dependency 'org.mongodb:mongodb-driver-core:5.1.4'
+		dependency 'org.springframework.data:spring-data-mongodb:4.3.10'
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation('io.micrometer:micrometer-registry-prometheus')
 	implementation 'no.fint:fint-altinn-model:1.0.2'
-
-	// Azure Cosmos DB server version 3.6 :-(
-	implementation 'org.mongodb:mongodb-driver-sync:5.1.4'
-	implementation 'org.mongodb:mongodb-driver-core:5.1.4'
-	implementation 'org.springframework.data:spring-data-mongodb:4.3.10'
 
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.48'
 
