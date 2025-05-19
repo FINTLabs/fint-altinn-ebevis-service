@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '3.4.4'
+	id 'org.springframework.boot' version '3.4.5'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'java'
 	id 'groovy'
@@ -55,8 +55,8 @@ dependencies {
 	}
 
 	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.spockframework:spock-spring:2.4-M5-groovy-4.0'
-	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring3x:4.15.0'
+	testImplementation 'org.spockframework:spock-spring:2.4-M6-groovy-4.0'
+	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring3x:4.20.0'
 	testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
 	testImplementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
