@@ -10,20 +10,17 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ConsentAcceptedPublisher {
-    private final KafkaAdmin kafkaAdmin;
     private final KafkaTemplate<String, KafkaEvidenceConsentAccepted> kafkaTemplate;
-    private final KafkaTopicNameProperties topics;
+    private final String topicName;
 
     public ConsentAcceptedPublisher(KafkaAdmin kafkaAdmin, KafkaTemplate<String, KafkaEvidenceConsentAccepted> kafkaTemplate, KafkaTopicNameProperties topics) {
-        this.kafkaAdmin = kafkaAdmin;
         this.kafkaTemplate = kafkaTemplate;
-        this.topics = topics;
+        this.topicName = topics.getConsentAccepted();
+
+        kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 1, (short) 1));
     }
 
     public void publish(KafkaEvidenceConsentAccepted kafkaConsentAccepted) {
-        String topicName = topics.getConsentAccepted();
-
-        kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 1, (short) 1));
 
         log.info("Publishing altinn instance to topic {}: {}", topicName, kafkaConsentAccepted);
 

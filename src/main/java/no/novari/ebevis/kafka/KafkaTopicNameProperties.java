@@ -11,4 +11,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "fint.kafka.topic")
 public class KafkaTopicNameProperties {
     private String consentAccepted;
+    private String consentRequest;
 }

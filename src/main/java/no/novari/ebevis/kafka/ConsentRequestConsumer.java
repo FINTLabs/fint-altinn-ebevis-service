@@ -5,7 +5,9 @@ import no.fint.altinn.model.AltinnApplication;
 import no.fint.altinn.model.AltinnApplicationStatus;
 import no.fint.altinn.model.kafka.KafkaEvidenceConsentRequest;
 import no.novari.ebevis.repository.AltinnApplicationRepository;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -14,8 +16,10 @@ public class ConsentRequestConsumer {
 
     private final AltinnApplicationRepository repository;
 
-    public ConsentRequestConsumer(AltinnApplicationRepository repository) {
+    public ConsentRequestConsumer(KafkaTopicNameProperties topics, AltinnApplicationRepository repository, KafkaAdmin kafkaAdmin) {
         this.repository = repository;
+
+        kafkaAdmin.createOrModifyTopics(new NewTopic(topics.getConsentRequest(), 1, (short) 1));
     }
 
     @KafkaListener(topics = "${fint.kafka.topic.consent-request}", groupId = "${spring.kafka.consumer.group-id}")
