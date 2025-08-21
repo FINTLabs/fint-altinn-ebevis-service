@@ -7,21 +7,13 @@ resources:
 patches:
 
   - patch: |-
+      
       - op: add
         path: "/spec/env/-"
         value:
           name: "altinn.base-url"
           value: "https://test-api.data.altinn.no/v1"
-#      - op: replace
-#        path: "/spec/kafka/acls/0/topic"
-#        value: "*.altinn.*"
-#      - op: add
-#        path: "/spec/url/basePath"
-#        value: "/beta"
-#      - op: replace
-#        path: "/spec/ingress/basePath"
-#        value: "/beta/api"
 
-  - target:
-      kind: Deployment
+    target:
+      kind: Application
       name: altinn-ebevis-service
