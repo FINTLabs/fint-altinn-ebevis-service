@@ -13,6 +13,10 @@ patches:
         value:
           name: "altinn.base-url"
           value: "https://test-api.data.altinn.no/v1"
+          
+      - op: replace
+        path: "/spec/kafka/acls/0/topic"
+        value: "*.ebevis.*"
 
     target:
       kind: Application

@@ -24,6 +24,7 @@ public class ConsentAcceptedPublisher {
         String topicName = topics.getConsentAccepted();
 
         kafkaAdmin.createOrModifyTopics(new NewTopic(topicName, 1, (short) 1));
+
         log.info("Publishing altinn instance to topic {}: {}", topicName, kafkaConsentAccepted);
 
         kafkaTemplate
