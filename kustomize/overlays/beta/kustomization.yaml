@@ -3,11 +3,15 @@ kind: Kustomization
 
 resources:
   - ../../base
-  - onepassword.yaml
 
 patches:
 
-#  - patch: |-
+  - patch: |-
+      - op: add
+        path: "/spec/env/-"
+        value:
+          name: "altinn.base-url"
+          value: "https://test-api.data.altinn.no/v1"
 #      - op: replace
 #        path: "/spec/kafka/acls/0/topic"
 #        value: "*.altinn.*"
@@ -21,4 +25,3 @@ patches:
   - target:
       kind: Deployment
       name: altinn-ebevis-service
-    path: deployment.yaml

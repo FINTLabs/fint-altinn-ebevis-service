@@ -63,7 +63,6 @@ spec:
   env:
     - { name: TZ, value: Europe/Oslo }
     - { name: JAVA_TOOL_OPTIONS, value: '-Xmx1G -XX:+ExitOnOutOfMemoryError' }
-    - { name: altinn.base-url, value: 'https://apim-nadobe-staging.azure-api.net/v1' }
     - { name: scheduling.initial-delay, value: '30000' }
     - { name: scheduling.fixed-delay, value: '600000' }
-    - { name: logging.level.no.fint, value: 'info' }
+    - { name: logging.level.no.fint, value: 'trace' }
