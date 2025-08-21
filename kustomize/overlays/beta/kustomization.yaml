@@ -7,6 +7,17 @@ resources:
 
 patches:
 
+#  - patch: |-
+#      - op: replace
+#        path: "/spec/kafka/acls/0/topic"
+#        value: "*.altinn.*"
+#      - op: add
+#        path: "/spec/url/basePath"
+#        value: "/beta"
+#      - op: replace
+#        path: "/spec/ingress/basePath"
+#        value: "/beta/api"
+
   - target:
       kind: Deployment
       name: altinn-ebevis-service

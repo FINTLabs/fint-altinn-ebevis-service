@@ -45,6 +45,8 @@ public class AccreditationService {
     private Mono<AltinnApplication> create(AltinnApplication application) {
         Authorization authorization = ConsentFactory.ofTaxiLicenseApplication(application);
 
+        log.debug("🙋‍♂️ Authorization request: {}", authorization);
+
         return client.createAccreditation(authorization)
                 .map(accreditation -> {
                     application.setStatus(AltinnApplicationStatus.CONSENTS_REQUESTED);
@@ -69,7 +71,7 @@ public class AccreditationService {
     }
 
     private Mono<AltinnApplication> altinnExceptionHandler(AltinnApplication application, AltinnException altinnException) {
-        log.error("Accreditation of archive reference: {} - {}", application.getArchiveReference(), altinnException.getErrorCode());
+        log.error("‼️ Accreditation of archive reference: {} - {}", application.getArchiveReference(), altinnException.getErrorCode());
 
         return Optional.of(altinnException)
                 .map(AltinnException::getErrorCode)

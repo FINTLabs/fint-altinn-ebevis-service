@@ -7,8 +7,10 @@ import no.fint.altinn.model.ConsentStatus;
 import no.fint.altinn.model.ebevis.Accreditation;
 import no.fint.altinn.model.ebevis.EvidenceStatus;
 import no.fint.altinn.model.ebevis.EvidenceStatusCode;
+import no.fint.altinn.model.kafka.KafkaEvidenceConsentAccepted;
 import no.novari.ebevis.client.DataAltinnClient;
 import no.novari.ebevis.exception.AltinnException;
+import no.novari.ebevis.kafka.ConsentAcceptedPublisher;
 import no.novari.ebevis.repository.AltinnApplicationRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -27,12 +29,14 @@ public class EvidenceService {
     private final AltinnApplicationRepository repository;
     private final EnumSet<AltinnApplicationStatus> validStatuses = EnumSet.of(AltinnApplicationStatus.CONSENTS_REQUESTED,
             AltinnApplicationStatus.CONSENTS_ACCEPTED);
+    private final ConsentAcceptedPublisher consentAcceptedPublisher;
 
     private OffsetDateTime lastUpdated = OffsetDateTime.parse("1970-01-01T00:00:00Z");
 
-    public EvidenceService(DataAltinnClient client, AltinnApplicationRepository repository) {
+    public EvidenceService(DataAltinnClient client, AltinnApplicationRepository repository, ConsentAcceptedPublisher consentAcceptedPublisher) {
         this.client = client;
         this.repository = repository;
+        this.consentAcceptedPublisher = consentAcceptedPublisher;
     }
 
     public Flux<AltinnApplication> updateEvidence() {
@@ -56,6 +60,7 @@ public class EvidenceService {
     private Flux<AltinnApplication> retrieve(Accreditation accreditation) {
         return Flux.fromIterable(repository.findAllByAccreditationId(accreditation.getId()));
     }
+
 
     private Mono<AltinnApplication> update(AltinnApplication application) {
         return client.getEvidenceStatuses(application.getAccreditationId())
@@ -102,6 +107,18 @@ public class EvidenceService {
         Collection<AltinnApplication.Consent> consents = application.getConsents().values();
 
         if (isAccepted.test(consents)) {
+
+            KafkaEvidenceConsentAccepted consentAccepted = KafkaEvidenceConsentAccepted.builder()
+                    .altinnReference(application.getArchiveReference())
+                    .organizationNumber(application.getRequestor())
+                    .countyOrganizationNumber(application.getRequestor())
+                    .fintOrgId(application.getFintOrgId())
+                    .consentsAccepted(List.of("RestanserV2", "KonkursDrosje"))
+                    .build();
+            consentAcceptedPublisher.publish(consentAccepted);
+
+
+
             application.setStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED);
         }
 

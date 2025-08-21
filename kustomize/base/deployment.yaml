@@ -1,54 +1,69 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: fintlabs.no/v1alpha1
+kind: Application
 metadata:
   name: altinn-ebevis-service
+  namespace: default
+  labels:
+    app.kubernetes.io/name: altinn-ebevis-service
+    app.kubernetes.io/instance: altinn-ebevis-service
+    app.kubernetes.io/version: latest
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: fint-drosjesentral
+    fintlabs.no/team: arkiv
+    fintlabs.no/org-id: fintlabs.no
 spec:
-  selector:
-    matchLabels:
-      app: altinn-ebevis-service
+  port: 8080
+  imagePullPolicy: Always
+  orgId: fintlabs.no
+  image: ghcr.io/fintlabs/fint-altinn-ebevis-service:sha-0000000
+  kafka:
+    enabled: true
+    acls:
+      - permission: admin
+        topic: 'no-permission'
+  ingress:
+    enabled: true
+  #  basePath: path
+  onePassword:
+    itemPath: 'vaults/aks-beta-vault/items/altinn-ebevis-service'
+  resources:
+    limits:
+      memory: "2G"
+      cpu: "500m"
+    requests:
+      memory: "1G"
+      cpu: "250m"
+  observability:
+    metrics:
+      enabled: true
+      port: "8080"
+      path: /actuator/prometheus
+  probes:
+    readiness:
+      path: /actuator/health/readiness
+      port: 8080
+      initialDelaySeconds: 0
+      failureThreshold: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+    liveness:
+      path: /actuator/health/liveness
+      port: 8080
+      initialDelaySeconds: 0
+      failureThreshold: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+  restartPolicy: Always
+  replicas: 1
   strategy:
     type: RollingUpdate
-    rollingUpdate: {maxSurge: 1, maxUnavailable: 0}
-  template:
-    metadata:
-      labels:
-        app: altinn-ebevis-service
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
-        prometheus.io/path: "actuator/prometheus"
-    spec:
-      containers:
-        - name: altinn-ebevis-service
-          image: ghcr.io/fintlabs/fint-altinn-ebevis-service:tba
-          resources:
-            limits:
-              memory: "2G"
-              cpu: "500m"
-            requests:
-              memory: "1G"
-              cpu: "250m"
-          ports:
-            - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: /actuator/health/readiness
-              port: 8080
-            initialDelaySeconds: 30
-            timeoutSeconds: 5
-          livenessProbe:
-            httpGet:
-              path: /actuator/health/liveness
-              port: 8080
-            initialDelaySeconds: 60
-            timeoutSeconds: 5
-          envFrom:
-            - secretRef:
-                name: altinn-ebevis-service
-          env:
-            - {name: TZ, value: Europe/Oslo}
-            - {name: JAVA_TOOL_OPTIONS, value: '-Xmx1G -XX:+ExitOnOutOfMemoryError'}
-            - {name: altinn.base-url, value: 'https://apim-nadobe-staging.azure-api.net/v1'}
-            - {name: scheduling.initial-delay, value: '30000'}
-            - {name: scheduling.fixed-delay, value: '600000'}
-            - {name: logging.level.no.fint, value: 'info'}
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  env:
+    - { name: TZ, value: Europe/Oslo }
+    - { name: JAVA_TOOL_OPTIONS, value: '-Xmx1G -XX:+ExitOnOutOfMemoryError' }
+    - { name: altinn.base-url, value: 'https://apim-nadobe-staging.azure-api.net/v1' }
+    - { name: scheduling.initial-delay, value: '30000' }
+    - { name: scheduling.fixed-delay, value: '600000' }
+    - { name: logging.level.no.fint, value: 'info' }

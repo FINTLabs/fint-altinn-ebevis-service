@@ -25,6 +25,7 @@ public class ExpiredService {
         List<AltinnApplication> applications = repository.findAllByStatusIn(Arrays.asList(AltinnApplicationStatus.CONSENTS_REQUESTED, AltinnApplicationStatus.CONSENTS_ACCEPTED));
 
         List<AltinnApplication> expired = applications.stream()
+                .filter(application -> application.getArchivedDate() != null)
                 .filter(application -> {
                     Duration between = Duration.between(application.getArchivedDate(), LocalDateTime.now());
 
