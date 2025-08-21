@@ -23,7 +23,7 @@ spec:
         topic: 'no-permission'
   ingress:
     enabled: true
-  #  basePath: path
+    basePath: "/"
   onePassword:
     itemPath: 'vaults/aks-beta-vault/items/altinn-ebevis-service'
   resources:
