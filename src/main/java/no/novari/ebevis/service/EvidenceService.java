@@ -7,7 +7,6 @@ import no.fint.altinn.model.ConsentStatus;
 import no.fint.altinn.model.ebevis.Accreditation;
 import no.fint.altinn.model.ebevis.EvidenceStatus;
 import no.fint.altinn.model.ebevis.EvidenceStatusCode;
-import no.fint.altinn.model.kafka.KafkaEvidenceConsentAccepted;
 import no.novari.ebevis.client.DataAltinnClient;
 import no.novari.ebevis.exception.AltinnException;
 import no.novari.ebevis.kafka.ConsentAcceptedPublisher;
@@ -29,14 +28,12 @@ public class EvidenceService {
     private final AltinnApplicationRepository repository;
     private final EnumSet<AltinnApplicationStatus> validStatuses = EnumSet.of(AltinnApplicationStatus.CONSENTS_REQUESTED,
             AltinnApplicationStatus.CONSENTS_ACCEPTED);
-    private final ConsentAcceptedPublisher consentAcceptedPublisher;
 
     private OffsetDateTime lastUpdated = OffsetDateTime.parse("1970-01-01T00:00:00Z");
 
-    public EvidenceService(DataAltinnClient client, AltinnApplicationRepository repository, ConsentAcceptedPublisher consentAcceptedPublisher) {
+    public EvidenceService(DataAltinnClient client, AltinnApplicationRepository repository) {
         this.client = client;
         this.repository = repository;
-        this.consentAcceptedPublisher = consentAcceptedPublisher;
     }
 
     public Flux<AltinnApplication> updateEvidence() {
@@ -77,25 +74,13 @@ public class EvidenceService {
                 .map(EvidenceStatus::getStatus)
                 .map(EvidenceStatusCode::getCode)
                 .ifPresent(code -> {
-                    ConsentStatus consentStatus;
-
-                    switch (code) {
-                        case 1:
-                            consentStatus = ConsentStatus.CONSENT_ACCEPTED;
-                            break;
-                        case 2:
-                            consentStatus = ConsentStatus.CONSENT_REQUESTED;
-                            break;
-                        case 3:
-                            consentStatus = ConsentStatus.CONSENT_REJECTED;
-                            break;
-                        case 4:
-                            consentStatus = ConsentStatus.CONSENT_EXPIRED;
-                            break;
-                        default:
-                            consentStatus = ConsentStatus.AWAITING_DATA_FROM_SOURCE;
-                            break;
-                    }
+                    ConsentStatus consentStatus = switch (code) {
+                        case 1 -> ConsentStatus.CONSENT_ACCEPTED;
+                        case 2 -> ConsentStatus.CONSENT_REQUESTED;
+                        case 3 -> ConsentStatus.CONSENT_REJECTED;
+                        case 4 -> ConsentStatus.CONSENT_EXPIRED;
+                        default -> ConsentStatus.AWAITING_DATA_FROM_SOURCE;
+                    };
 
                     application.getConsents().computeIfPresent(status.getEvidenceCodeName(), (key, value) -> {
                         value.setStatus(consentStatus);
@@ -107,18 +92,6 @@ public class EvidenceService {
         Collection<AltinnApplication.Consent> consents = application.getConsents().values();
 
         if (isAccepted.test(consents)) {
-
-            KafkaEvidenceConsentAccepted consentAccepted = KafkaEvidenceConsentAccepted.builder()
-                    .altinnReference(application.getArchiveReference())
-                    .organizationNumber(application.getRequestor())
-                    .countyOrganizationNumber(application.getRequestor())
-                    .fintOrgId(application.getFintOrgId())
-                    .consentsAccepted(List.of("RestanserV2", "KonkursDrosje"))
-                    .build();
-            consentAcceptedPublisher.publish(consentAccepted);
-
-
-
             application.setStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED);
         }
 

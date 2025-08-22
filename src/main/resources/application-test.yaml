@@ -28,4 +28,5 @@ spring:
 
 logging:
   level:
-    no.novari.ebevis: TRACE
+    no.novari.ebevis: trace
+    org.apache.kafka.clients: warn

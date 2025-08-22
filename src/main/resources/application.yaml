@@ -24,3 +24,8 @@ spring:
   profiles:
     include:
       - kafka
+
+logging:
+  level:
+    no.novari.ebevis: debug
+    org.apache.kafka.clients: warn
