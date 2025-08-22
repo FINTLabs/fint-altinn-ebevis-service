@@ -26,7 +26,6 @@ import java.time.OffsetDateTime
 @Import(MongoConfiguration.class)
 class EvidenceServiceSpec extends Specification {
     DataAltinnClient client = Mock()
-    ConsentAcceptedPublisher consentPublisher = Mock()
 
     @Autowired
     AltinnApplicationRepository repository
@@ -34,7 +33,7 @@ class EvidenceServiceSpec extends Specification {
     EvidenceService service
 
     void setup() {
-        service = new EvidenceService(client, repository, consentPublisher)
+        service = new EvidenceService(client, repository)
     }
 
     void cleanup() {

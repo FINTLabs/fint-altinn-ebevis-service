@@ -74,13 +74,25 @@ public class EvidenceService {
                 .map(EvidenceStatus::getStatus)
                 .map(EvidenceStatusCode::getCode)
                 .ifPresent(code -> {
-                    ConsentStatus consentStatus = switch (code) {
-                        case 1 -> ConsentStatus.CONSENT_ACCEPTED;
-                        case 2 -> ConsentStatus.CONSENT_REQUESTED;
-                        case 3 -> ConsentStatus.CONSENT_REJECTED;
-                        case 4 -> ConsentStatus.CONSENT_EXPIRED;
-                        default -> ConsentStatus.AWAITING_DATA_FROM_SOURCE;
-                    };
+                    ConsentStatus consentStatus;
+
+                    switch (code) {
+                        case 1:
+                            consentStatus = ConsentStatus.CONSENT_ACCEPTED;
+                            break;
+                        case 2:
+                            consentStatus = ConsentStatus.CONSENT_REQUESTED;
+                            break;
+                        case 3:
+                            consentStatus = ConsentStatus.CONSENT_REJECTED;
+                            break;
+                        case 4:
+                            consentStatus = ConsentStatus.CONSENT_EXPIRED;
+                            break;
+                        default:
+                            consentStatus = ConsentStatus.AWAITING_DATA_FROM_SOURCE;
+                            break;
+                    }
 
                     application.getConsents().computeIfPresent(status.getEvidenceCodeName(), (key, value) -> {
                         value.setStatus(consentStatus);
