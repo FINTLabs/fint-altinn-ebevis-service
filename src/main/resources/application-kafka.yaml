@@ -1,9 +1,9 @@
 fint:
   kafka:
     topic:
-      consent-request: altinn.ebevis.event.consent-request
-      consent-accepted: altinn.ebevis.event.consent-accepted
-
+      orgs: [ ofk-no, bfk-no]
+      consent-request-postfix: .altinn.event.consent-request
+      consent-accepted-postfix: .altinn.event.consent-accepted
 spring:
   kafka:
     properties:

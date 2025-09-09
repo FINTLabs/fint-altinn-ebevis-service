@@ -66,3 +66,4 @@ spec:
     - { name: scheduling.initial-delay, value: '30000' }
     - { name: scheduling.fixed-delay, value: '60000' }
     - { name: logging.level.no.fint, value: 'trace' }
+    - { name: fint.font, value: '/app/times.ttf' }

@@ -14,22 +14,24 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class ConsentAcceptedPublisher {
+public class ConsentAcceptedProducer {
     private final KafkaTemplate<String, KafkaEvidenceConsentAccepted> kafkaTemplate;
-    private final String topicName;
+    private final String topicNamePostfix;
     private final AltinnApplicationRepository repository;
 
-    public ConsentAcceptedPublisher(KafkaTemplate<String, KafkaEvidenceConsentAccepted> kafkaTemplate, KafkaTopicNameProperties topics, AltinnApplicationRepository repository) {
+    public ConsentAcceptedProducer(KafkaTemplate<String, KafkaEvidenceConsentAccepted> kafkaTemplate, KafkaTopicNameProperties topics, AltinnApplicationRepository repository) {
         this.kafkaTemplate = kafkaTemplate;
-        this.topicName = topics.getConsentAccepted();
+        this.topicNamePostfix = topics.getConsentAcceptedPostfix();
         this.repository = repository;
     }
 
     public void publish(KafkaEvidenceConsentAccepted kafkaConsentAccepted) {
-        String key = kafkaConsentAccepted.getAltinnReference();
+        String key = kafkaConsentAccepted.getAltinnInstanceId();
         Assert.hasText(key, "altinnReference must not be null or blank");
 
-        log.info("Publishing consent accepted to topic={}, key={}", topicName, key);
+        String topicName = kafkaConsentAccepted.getFintOrgId()
+                .replace(".", "-")
+                .concat(topicNamePostfix);
 
         kafkaTemplate
                 .send(topicName, key, kafkaConsentAccepted)
@@ -47,22 +49,24 @@ public class ConsentAcceptedPublisher {
 
     public Flux<AltinnApplication> sendAcceptedConsents() {
         return Flux.fromIterable(repository.findAllByStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED))
-                .doOnNext(this::publishAcceptedConsent)
+                .map(this::publishAcceptedConsent)
                 .map(this::setApplicatonStatus)
                 .onErrorContinue((ex, result) -> log.debug("Error when publishing consent accepted: {}, {}", ex, result))
                 .map(repository::save);
     }
 
-    private void publishAcceptedConsent(AltinnApplication application) {
+    private AltinnApplication publishAcceptedConsent(AltinnApplication application) {
         KafkaEvidenceConsentAccepted consentAccepted = KafkaEvidenceConsentAccepted.builder()
-                .altinnReference(application.getArchiveReference())
-                .organizationNumber(application.getRequestor())
+                .altinnInstanceId(application.getInstanceId())
+                .organizationNumber(application.getSubject())
+                .organizationName(application.getSubjectName())
                 .countyOrganizationNumber(application.getRequestor())
                 .fintOrgId(application.getFintOrgId())
                 .consentsAccepted(List.of("RestanserV2", "KonkursDrosje"))
                 .build();
 
         this.publish(consentAccepted);
+        return application;
     }
 
     private AltinnApplication setApplicatonStatus(AltinnApplication application) {

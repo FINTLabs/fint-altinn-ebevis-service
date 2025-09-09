@@ -9,7 +9,6 @@ import no.fint.altinn.model.ebevis.EvidenceStatus;
 import no.fint.altinn.model.ebevis.EvidenceStatusCode;
 import no.novari.ebevis.client.DataAltinnClient;
 import no.novari.ebevis.exception.AltinnException;
-import no.novari.ebevis.kafka.ConsentAcceptedPublisher;
 import no.novari.ebevis.repository.AltinnApplicationRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

@@ -13,22 +13,26 @@ import org.springframework.stereotype.Component;
 public class ConsentRequestConsumer {
 
     private final AltinnApplicationRepository repository;
+    private final KafkaTopicNameProperties kafkaTopicNameProperties;
 
-    public ConsentRequestConsumer(AltinnApplicationRepository repository) {
+    public ConsentRequestConsumer(AltinnApplicationRepository repository, KafkaTopicNameProperties kafkaTopicNameProperties) {
         this.repository = repository;
+        this.kafkaTopicNameProperties = kafkaTopicNameProperties;
     }
 
-    @KafkaListener(topics = "${fint.kafka.topic.consent-request}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "#{@kafkaTopicNameProperties.getConsentRequestTopicsArray()}", groupId = "${spring.kafka.consumer.group-id}")
     public void consume(KafkaEvidenceConsentRequest evidenceRequest) {
 
         log.info("Congratulations! 🎉 You received a new InstanceActor with altinnReference {} and organizationNumber {}, orgId {}",
-                evidenceRequest.getAltinnReference(),
+                evidenceRequest.getAltinnInstanceId(),
                 evidenceRequest.getOrganizationNumber(), evidenceRequest.getFintOrgId());
 
         AltinnApplication application = new AltinnApplication();
-        application.setArchiveReference(evidenceRequest.getAltinnReference());
+        application.setArchiveReference(evidenceRequest.getAltinnInstanceId().replace("/", "-"));
+        application.setInstanceId(evidenceRequest.getAltinnInstanceId());
         application.setRequestor(evidenceRequest.getCountyOrganizationNumber());
         application.setSubject(evidenceRequest.getOrganizationNumber());
+        application.setSubjectName(evidenceRequest.getOrganizationName());
         application.setStatus(AltinnApplicationStatus.NEW);
         application.setFintOrgId(evidenceRequest.getFintOrgId());
 

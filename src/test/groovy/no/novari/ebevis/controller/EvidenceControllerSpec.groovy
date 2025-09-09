@@ -3,8 +3,9 @@ package no.novari.ebevis.controller
 import no.fint.altinn.model.ebevis.ErrorCode
 import no.fint.altinn.model.ebevis.Evidence
 import no.novari.ebevis.client.DataAltinnClient
-import no.novari.ebevis.controller.EvidenceController
 import no.novari.ebevis.exception.AltinnException
+import no.novari.ebevis.repository.AltinnApplicationRepository
+import no.novari.ebevis.util.CertificateConverter
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
@@ -21,6 +22,12 @@ class EvidenceControllerSpec extends Specification {
 
     @SpringBean
     DataAltinnClient client = Mock()
+
+    @SpringBean
+    CertificateConverter certificateConverter = Mock()
+
+    @SpringBean
+    AltinnApplicationRepository altinnApplicationRepository = Mock()
 
     def "Get application returns evidence"() {
         when:

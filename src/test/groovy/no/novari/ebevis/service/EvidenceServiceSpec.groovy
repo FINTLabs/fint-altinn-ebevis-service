@@ -10,7 +10,6 @@ import no.fint.altinn.model.ebevis.EvidenceStatusCode
 import no.novari.ebevis.client.DataAltinnClient
 import no.novari.ebevis.configuration.MongoConfiguration
 import no.novari.ebevis.exception.AltinnException
-import no.novari.ebevis.kafka.ConsentAcceptedPublisher
 import no.novari.ebevis.repository.AltinnApplicationRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
