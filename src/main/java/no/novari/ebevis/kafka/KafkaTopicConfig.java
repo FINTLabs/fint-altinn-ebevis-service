@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaAdmin.NewTopics;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,17 +20,19 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public KafkaAdmin.NewTopics consentAcceptedTopic() {
+    public NewTopics consentAcceptedTopic() {
         log.info("Creating topic(s) for consent accepted: {}", topics.getConsentAcceptedTopics());
-        return new KafkaAdmin.NewTopics(topics.getConsentAcceptedTopics().stream()
+
+        return new NewTopics(topics.getConsentAcceptedTopics().stream()
                 .map(topicName -> new NewTopic(topicName, 1, (short) 1))
                 .toArray(NewTopic[]::new));
     }
 
     @Bean
-    public KafkaAdmin.NewTopics consentRequestTopics() {
+    public NewTopics consentRequestTopics() {
         log.info("Creating topic(s) for consent requests: {}", topics.getConsentRequestTopics());
-        return new KafkaAdmin.NewTopics(topics.getConsentRequestTopics().stream()
+
+        return new NewTopics(topics.getConsentRequestTopics().stream()
                 .map(topicName -> new NewTopic(topicName, 1, (short) 1))
                 .toArray(NewTopic[]::new));
     }
