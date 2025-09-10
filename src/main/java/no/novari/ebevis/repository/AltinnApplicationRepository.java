@@ -16,4 +16,6 @@ public interface AltinnApplicationRepository extends MongoRepository<AltinnAppli
     List<AltinnApplication> findAllByStatusInAndAccreditationIdIn(List<AltinnApplicationStatus> statuses, List<String> ids);
 
     List<AltinnApplication> findAllByAccreditationId(String accreditationId);
+
+    List<AltinnApplication> findAllByInstanceId(String instanceId);
 }
