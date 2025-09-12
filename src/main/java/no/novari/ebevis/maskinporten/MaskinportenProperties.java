@@ -1,4 +1,4 @@
-package no.novari.ebevis.configuration;
+package no.novari.ebevis.maskinporten;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

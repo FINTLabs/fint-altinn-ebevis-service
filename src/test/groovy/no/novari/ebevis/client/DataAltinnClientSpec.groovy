@@ -6,8 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.fint.altinn.model.ebevis.Accreditation
 import no.fint.altinn.model.ebevis.Evidence
-import no.novari.ebevis.client.DataAltinnClient
-import no.novari.ebevis.configuration.MaskinportenConfiguration
+import no.novari.ebevis.maskinporten.MaskinportenConfiguration
 import no.novari.ebevis.util.MediaTypeSerializer
 import no.novari.ebevis.util.ObjectFactory
 import okhttp3.mockwebserver.MockResponse
@@ -18,7 +17,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.test.StepVerifier
 import spock.lang.Specification
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Mono
 
 import java.time.OffsetDateTime
 

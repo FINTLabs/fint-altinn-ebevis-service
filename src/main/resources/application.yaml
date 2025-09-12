@@ -28,5 +28,5 @@ spring:
 logging:
   level:
     no.novari.ebevis: debug
-    no.fintlabs.altinn.maskinporten: info
+    no.novari.ebevis.maskinporten: info
     org.apache.kafka.clients: warn

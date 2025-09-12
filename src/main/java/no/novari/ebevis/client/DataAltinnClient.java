@@ -1,7 +1,7 @@
 package no.novari.ebevis.client;
 
 import no.fint.altinn.model.ebevis.*;
-import no.novari.ebevis.configuration.MaskinportenConfiguration;
+import no.novari.ebevis.maskinporten.MaskinportenConfiguration;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
