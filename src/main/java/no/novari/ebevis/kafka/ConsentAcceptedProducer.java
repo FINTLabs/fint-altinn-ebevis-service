@@ -56,16 +56,21 @@ public class ConsentAcceptedProducer {
     }
 
     private AltinnApplication publishAcceptedConsent(AltinnApplication application) {
-        KafkaEvidenceConsentAccepted consentAccepted = KafkaEvidenceConsentAccepted.builder()
-                .altinnInstanceId(application.getInstanceId())
-                .organizationNumber(application.getSubject())
-                .organizationName(application.getSubjectName())
-                .countyOrganizationNumber(application.getRequestor())
-                .fintOrgId(application.getFintOrgId())
-                .consentsAccepted(List.of("RestanserV2", "KonkursDrosje"))
-                .build();
 
-        this.publish(consentAccepted);
+        if (application.getArchiveReference().startsWith("AR")) {
+            log.info("Will not send drosjeløyve with reference {} to FLYT.", application.getArchiveReference());
+        } else {
+            KafkaEvidenceConsentAccepted consentAccepted = KafkaEvidenceConsentAccepted.builder()
+                    .altinnInstanceId(application.getInstanceId())
+                    .organizationNumber(application.getSubject())
+                    .organizationName(application.getSubjectName())
+                    .countyOrganizationNumber(application.getRequestor())
+                    .fintOrgId(application.getFintOrgId())
+                    .consentsAccepted(List.of("RestanserV2", "KonkursDrosje"))
+                    .build();
+
+            this.publish(consentAccepted);
+        }
         return application;
     }
 

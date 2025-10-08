@@ -23,9 +23,10 @@ public class ConsentRequestConsumer {
     @KafkaListener(topics = "#{@kafkaTopicNameProperties.getConsentRequestTopicsArray()}", groupId = "${spring.kafka.consumer.group-id}")
     public void consume(KafkaEvidenceConsentRequest evidenceRequest) {
 
-        log.info("Congratulations! 🎉 You received a new InstanceActor with altinnReference {} and organizationNumber {}, orgId {}",
+        log.info("Received a new consent request with altinnInstanceId {} and organizationNumber {}, orgId {}",
                 evidenceRequest.getAltinnInstanceId(),
-                evidenceRequest.getOrganizationNumber(), evidenceRequest.getFintOrgId());
+                evidenceRequest.getOrganizationNumber(),
+                evidenceRequest.getFintOrgId());
 
         AltinnApplication application = new AltinnApplication();
         application.setArchiveReference(evidenceRequest.getAltinnInstanceId().replace("/", "-"));
