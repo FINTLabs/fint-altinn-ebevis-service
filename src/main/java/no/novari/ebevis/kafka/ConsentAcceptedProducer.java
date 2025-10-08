@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 
+import java.time.Duration;
 import java.util.List;
 
 @Slf4j
@@ -49,28 +50,33 @@ public class ConsentAcceptedProducer {
 
     public Flux<AltinnApplication> sendAcceptedConsents() {
         return Flux.fromIterable(repository.findAllByStatus(AltinnApplicationStatus.CONSENTS_ACCEPTED))
+                .filter(application -> {
+                    boolean isDrosjesentral = !application.getArchiveReference().startsWith("AR");
+                    if (!isDrosjesentral) {
+                        log.info("Application {} is a drosjeløyvesøknad and will not be sent to FLYT.", application.getArchiveReference());
+                    }
+                    return isDrosjesentral;
+                })
                 .map(this::publishAcceptedConsent)
                 .map(this::setApplicatonStatus)
+                .delayElements(Duration.ofMillis(1000))
                 .onErrorContinue((ex, result) -> log.debug("Error when publishing consent accepted: {}, {}", ex, result))
                 .map(repository::save);
     }
 
     private AltinnApplication publishAcceptedConsent(AltinnApplication application) {
 
-        if (application.getArchiveReference().startsWith("AR")) {
-            log.info("Will not send drosjeløyve with reference {} to FLYT.", application.getArchiveReference());
-        } else {
-            KafkaEvidenceConsentAccepted consentAccepted = KafkaEvidenceConsentAccepted.builder()
-                    .altinnInstanceId(application.getInstanceId())
-                    .organizationNumber(application.getSubject())
-                    .organizationName(application.getSubjectName())
-                    .countyOrganizationNumber(application.getRequestor())
-                    .fintOrgId(application.getFintOrgId())
-                    .consentsAccepted(List.of("RestanserV2", "KonkursDrosje"))
-                    .build();
+        KafkaEvidenceConsentAccepted consentAccepted = KafkaEvidenceConsentAccepted.builder()
+                .altinnInstanceId(application.getInstanceId())
+                .organizationNumber(application.getSubject())
+                .organizationName(application.getSubjectName())
+                .countyOrganizationNumber(application.getRequestor())
+                .fintOrgId(application.getFintOrgId())
+                .consentsAccepted(List.of("RestanserV2", "KonkursDrosje"))
+                .build();
 
-            this.publish(consentAccepted);
-        }
+        this.publish(consentAccepted);
+
         return application;
     }
 
