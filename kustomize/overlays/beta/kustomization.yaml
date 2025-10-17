@@ -5,21 +5,13 @@ resources:
   - ../../base
 
 patches:
+  - path: deployment.yaml
 
   - patch: |-
+      
       - op: replace
-        path: "/spec/orgId"
-        value: "ofk.no"
-        
-      - op: add
-        path: "/spec/env/-"
-        value:
-          name: "altinn.base-url"
-          value: "https://test-api.data.altinn.no/v1"
-          
-      - op: replace
-        path: "/spec/kafka/acls/0/topic"
-        value: "*.altinn.*"
+        path: "/spec/onePassword/itemPath"
+        value: "vaults/aks-beta-vault/items/altinn-ebevis-service"
 
     target:
       kind: Application

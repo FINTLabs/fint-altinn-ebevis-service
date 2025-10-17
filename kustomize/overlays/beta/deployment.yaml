@@ -1,14 +1,15 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: fintlabs.no/v1alpha1
+kind: Application
 metadata:
   name: altinn-ebevis-service
 spec:
-  template:
-    spec:
-      containers:
-        - name: altinn-ebevis-service
-          env:
-            - {name: altinn.base-url, value: 'https://test-api.data.altinn.no/v1'}
-            - {name: scheduling.initial-delay, value: '30000'}
-            - {name: scheduling.fixed-delay, value: '600000'}
-            - {name: logging.level.no.fint, value: 'trace'}
+  env:
+    - {name: altinn.base-url, value: 'https://test-api.data.altinn.no/v1'}
+
+    - {name: fint.kafka.topic.orgs.0, value: 'bfk-no'}
+    - {name: fint.kafka.topic.orgs.1, value: 'ofk-no'}
+
+    - {name: scheduling.initial-delay, value: '30000'}
+    - {name: scheduling.fixed-delay, value: '600000'}
+
+    - {name: logging.level.no.fint, value: 'trace'}
