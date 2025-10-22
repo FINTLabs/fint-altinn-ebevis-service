@@ -1,4 +1,4 @@
-package no.novari.ebevis.configuration;
+package no.novari.ebevis.maskinporten;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;

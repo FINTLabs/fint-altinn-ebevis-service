@@ -3,11 +3,16 @@ kind: Kustomization
 
 resources:
   - ../../base
-  - onepassword.yaml
 
 patches:
+  - path: deployment.yaml
 
-  - target:
-      kind: Deployment
+  - patch: |-
+      
+      - op: replace
+        path: "/spec/onePassword/itemPath"
+        value: "vaults/aks-api-vault/items/altinn-ebevis-service"
+
+    target:
+      kind: Application
       name: altinn-ebevis-service
-    path: deployment.yaml

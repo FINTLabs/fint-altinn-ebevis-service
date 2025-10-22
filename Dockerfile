@@ -6,5 +6,6 @@ RUN gradle --no-daemon build
 FROM gcr.io/distroless/java21
 ENV JAVA_TOOL_OPTIONS=-XX:+ExitOnOutOfMemoryError
 WORKDIR /app
+COPY --from=builder /home/gradle/src/main/resources/times.ttf /app/times.ttf
 COPY --from=builder /home/gradle/build/libs/fint-altinn-ebevis-service.jar /app/fint-altinn-ebevis-service.jar
 CMD ["/app/fint-altinn-ebevis-service.jar"]

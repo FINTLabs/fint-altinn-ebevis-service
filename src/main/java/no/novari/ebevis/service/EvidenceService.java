@@ -57,6 +57,7 @@ public class EvidenceService {
         return Flux.fromIterable(repository.findAllByAccreditationId(accreditation.getId()));
     }
 
+
     private Mono<AltinnApplication> update(AltinnApplication application) {
         return client.getEvidenceStatuses(application.getAccreditationId())
                 .map(evidenceStatuses -> updateEvidenceStatus(application, evidenceStatuses))

@@ -1,0 +1,29 @@
+fint:
+  kafka:
+    topic:
+      orgs: [ ofk-no, bfk-no]
+      consent-request-postfix: .altinn.event.consent-request
+      consent-accepted-postfix: .altinn.event.consent-accepted
+spring:
+  kafka:
+    properties:
+        security.protocol: SSL
+    admin:
+      enabled: true
+    template:
+      observation-enabled: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 10
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+    consumer:
+      group-id: ebevis-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      #auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: no.fint.altinn.model.*

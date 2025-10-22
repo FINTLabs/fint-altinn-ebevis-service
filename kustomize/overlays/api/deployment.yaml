@@ -1,22 +1,21 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: fintlabs.no/v1alpha1
+kind: Application
 metadata:
   name: altinn-ebevis-service
 spec:
-  template:
-    spec:
-      containers:
-        - name: altinn-ebevis-service
-          resources:
-            limits:
-              memory: "4Gi"
-              cpu: "500m"
-            requests:
-              memory: "3Gi"
-              cpu: "250m"
-          env:
-            - {name: JAVA_TOOL_OPTIONS, value: '-Xmx3G -XX:+ExitOnOutOfMemoryError'}
-            - {name: altinn.base-url, value: 'https://api.data.altinn.no/v1'}
-            - {name: scheduling.initial-delay, value: '30000'}
-            - {name: scheduling.fixed-delay, value: '60000'}
-            - {name: logging.level.no.fint, value: 'debug'}
+  resources:
+    limits:
+      memory: "4Gi"
+      cpu: "500m"
+    requests:
+      memory: "3Gi"
+      cpu: "250m"
+  env:
+    - {name: altinn.base-url, value: 'https://api.data.altinn.no/v1'}
+
+    - {name: fint.kafka.topic.orgs.0, value: 'bfk-no'}
+
+    - {name: scheduling.initial-delay, value: '30000'}
+    - {name: scheduling.fixed-delay, value: '600000'}
+
+    - {name: logging.level.no.fint, value: 'debug'}

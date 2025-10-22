@@ -1,4 +1,4 @@
-package no.novari.ebevis.configuration;
+package no.novari.ebevis.maskinporten;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
