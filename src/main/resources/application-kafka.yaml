@@ -1,7 +1,7 @@
 fint:
   kafka:
     topic:
-      orgs: [ ofk-no, bfk-no]
+      orgs: [ bfk-no]
       consent-request-postfix: .altinn.event.consent-request
       consent-accepted-postfix: .altinn.event.consent-accepted
 spring:
