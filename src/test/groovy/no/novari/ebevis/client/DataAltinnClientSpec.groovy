@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.fint.altinn.model.ebevis.Accreditation
 import no.fint.altinn.model.ebevis.Evidence
-import no.novari.ebevis.maskinporten.MaskinportenConfiguration
+import no.novari.ebevis.maskinporten.MaskinportenService
 import no.novari.ebevis.util.MediaTypeSerializer
 import no.novari.ebevis.util.ObjectFactory
 import okhttp3.mockwebserver.MockResponse
@@ -34,9 +34,9 @@ class DataAltinnClientSpec extends Specification {
     void setup() {
         mockWebServer.start()
         webClient = WebClient.builder().baseUrl('http://localhost:' + mockWebServer.getPort()).build()
-        MaskinportenConfiguration maskinportenConfiguration = Mock()
-        maskinportenConfiguration.getBearerToken() >> Mono.just("Bearer X")
-        dataAltinnClient = new DataAltinnClient(webClient, maskinportenConfiguration)
+        MaskinportenService maskinportenService = Mock()
+        maskinportenService.getBearerToken() >> Mono.just("Bearer X")
+        dataAltinnClient = new DataAltinnClient(webClient, maskinportenService)
     }
 
     void cleanup() {

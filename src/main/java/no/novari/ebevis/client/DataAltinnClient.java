@@ -1,7 +1,7 @@
 package no.novari.ebevis.client;
 
 import no.fint.altinn.model.ebevis.*;
-import no.novari.ebevis.maskinporten.MaskinportenConfiguration;
+import no.novari.ebevis.maskinporten.MaskinportenService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,9 @@ import java.util.List;
 @Component
 public class DataAltinnClient {
     private final WebClient webClient;
-    private final MaskinportenConfiguration maskinporten;
+    private final MaskinportenService maskinporten;
 
-    public DataAltinnClient(WebClient webClient, MaskinportenConfiguration maskinporten) {
+    public DataAltinnClient(WebClient webClient, MaskinportenService maskinporten) {
         this.webClient = webClient;
         this.maskinporten = maskinporten;
     }
