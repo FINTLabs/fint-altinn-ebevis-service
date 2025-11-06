@@ -18,4 +18,6 @@ spec:
     - {name: scheduling.initial-delay, value: '30000'}
     - {name: scheduling.fixed-delay, value: '180000'}
 
-    - {name: logging.level.no.fint, value: 'debug'}
+    - { name: logging.level.no.novari.ebevis, value: 'info' }
+    - { name: logging.level.no.novari.ebevis.maskinporten, value: 'debug' }
+    - { name: logging.level.org.apache.kafka.clients, value: 'warn' }
