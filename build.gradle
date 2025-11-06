@@ -49,7 +49,7 @@ dependencies {
 
     implementation 'no.fint:fint-altinn-model:3.0.0-rc-8'
 
-    implementation 'com.itextpdf:itext7-core:7.1.17'
+    implementation 'com.itextpdf:itext7-core:9.3.0'
 
     implementation 'com.nimbusds:nimbus-jose-jwt:9.48'
 

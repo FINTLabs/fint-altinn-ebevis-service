@@ -4,13 +4,16 @@ import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.pdf.*;
+import com.itextpdf.kernel.pdf.PdfAConformance;
+import com.itextpdf.kernel.pdf.PdfOutputIntent;
+import com.itextpdf.kernel.pdf.PdfString;
+import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.action.PdfAction;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Link;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
-import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.pdfa.PdfADocument;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -24,6 +27,9 @@ import no.fint.altinn.model.ebevis.vocab.ValueType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.awt.color.ColorSpace;
+import java.awt.color.ICC_Profile;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,20 +89,20 @@ public class CertificateConverter {
 
             document.add(new Paragraph("U.off. offl. § 13, sktbl. § 3-2").setTextAlignment(TextAlignment.RIGHT));
 
-            document.add(new Paragraph("Attest for skatt og merverdiavgift").setFontSize(18).setBold());
+            document.add(new Paragraph("Attest for skatt og merverdiavgift").setFontSize(18).simulateBold());
 
             document.add(new Paragraph("Attesten er produsert på bakgrunn av registrerte opplysninger i skatte- og avgiftssystemene." +
                     " For spørsmål om merverdiavgift kontakt Skatteetaten. For spørsmål om øvrige skatte- og avgiftskrav kontakt skatteoppkrever."));
 
-            document.add(new Paragraph("Gjelder:").setBold());
+            document.add(new Paragraph("Gjelder:").simulateBold());
 
             document.add(new Paragraph(String.format("%s (%s)", application.getSubjectName(), application.getSubject())));
 
-            document.add(new Paragraph("Følgende forfalte ikke betalte restanser er registrert på ovennevnte foretak:").setBold());
+            document.add(new Paragraph("Følgende forfalte ikke betalte restanser er registrert på ovennevnte foretak:").simulateBold());
 
             addEvidence(evidence, document);
 
-            document.add(new Paragraph("Ved offentlige anskaffelser skal attesten ikke være eldre enn 6 måneder.").setBold());
+            document.add(new Paragraph("Ved offentlige anskaffelser skal attesten ikke være eldre enn 6 måneder.").simulateBold());
             document.add(new Paragraph("Dokumentet er elektronisk godkjent og er derfor ikke signert."));
             document.add(new Paragraph()
                             .add(new Link("Skatteetaten", PdfAction.createURI("https://skatteetaten.no")))
@@ -120,18 +126,18 @@ public class CertificateConverter {
             pdfFile.deleteOnExit();
 
             Document document = createDocument(pdfFile);
-            document.add(new Paragraph("Brønnøysundregistrene").setFontSize(18).setItalic());
+            document.add(new Paragraph("Brønnøysundregistrene").setFontSize(18).simulateItalic());
             document.add(new Paragraph(BANKRUPT_TITLE).setFontSize(36));
 
             document.add(new Paragraph("Vi viser til din bestilling vedrørende:"));
 
             document.add(new Paragraph(String.format("%s (%s)", application.getSubjectName(), application.getSubject())));
 
-            document.add(new Paragraph("Konkursregisteret har følgende registrerte opplysninger:").setBold());
+            document.add(new Paragraph("Konkursregisteret har følgende registrerte opplysninger:").simulateBold());
 
             addEvidence(evidence, document);
 
-            document.add(new Paragraph("Ved offentlige anskaffelser skal attesten ikke være eldre enn 6 måneder.").setBold());
+            document.add(new Paragraph("Ved offentlige anskaffelser skal attesten ikke være eldre enn 6 måneder.").simulateBold());
             document.add(new Paragraph("Dokumentet er elektronisk godkjent og er derfor ikke signert."));
             document.add(new Paragraph()
                     .add(new Link("Brønnøysundregistrene", PdfAction.createURI("https://brreg.no")))
@@ -151,8 +157,12 @@ public class CertificateConverter {
 
     private Document createDocument(File pdfFile) throws IOException {
         PdfADocument pdfADocument = new PdfADocument(new PdfWriter(pdfFile),
-                PdfAConformanceLevel.PDF_A_1A,
-                new PdfOutputIntent(new PdfDictionary()));
+                PdfAConformance.PDF_A_1A,
+                new PdfOutputIntent("sRGB IEC61966-2.1",
+                        "",
+                        "http://www.color.org",
+                        "sRGB IEC61966-2.1",
+                        new ByteArrayInputStream(ICC_Profile.getInstance(ColorSpace.CS_sRGB).getData())));
 
         Document document = new Document(pdfADocument);
         pdfADocument.setTagged();
@@ -166,7 +176,7 @@ public class CertificateConverter {
             try (InputStream fontStream = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
                 if (fontStream != null) {
                     byte[] fontBytes = fontStream.readAllBytes();
-                    pdfFont = PdfFontFactory.createFont(fontBytes, PdfEncodings.WINANSI, true);
+                    pdfFont = PdfFontFactory.createFont(fontBytes, PdfEncodings.WINANSI);
                     log.info("Successfully loaded embedded font from: {}", fontFile);
                 } else {
                     log.error("Font resource not found: {}", fontFile);
