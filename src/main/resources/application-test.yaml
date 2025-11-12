@@ -1,3 +1,8 @@
+fint:
+  kafka:
+    topic:
+      orgs: [ ofk-no ]
+
 scheduling:
   initial-delay: 10000
   fixed-delay: 60000
