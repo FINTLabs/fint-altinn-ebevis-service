@@ -14,6 +14,11 @@ spec:
     - {name: altinn.base-url, value: 'https://api.data.altinn.no/v1'}
 
     - {name: fint.kafka.topic.orgs.0, value: 'bfk-no'}
+    - {name: fint.kafka.topic.orgs.1, value: 'ofk-no' }
+    - {name: fint.kafka.topic.orgs.2, value: 'mrfylke-no' }
+    - {name: fint.kafka.topic.orgs.3, value: 'trondelagfylke-no' }
+    - {name: fint.kafka.topic.orgs.4, value: 'agderfk-no' }
+
 
     - {name: scheduling.initial-delay, value: '30000'}
     - {name: scheduling.fixed-delay, value: '180000'}

@@ -8,6 +8,8 @@ spec:
 
     - {name: fint.kafka.topic.orgs.0, value: 'bfk-no'}
     - {name: fint.kafka.topic.orgs.1, value: 'ofk-no'}
+    - {name: fint.kafka.topic.orgs.2, value: 'trondelagfylke-no' }
+    - {name: fint.kafka.topic.orgs.3, value: 'agderfk-no' }
 
     - {name: scheduling.initial-delay, value: '30000'}
     - {name: scheduling.fixed-delay, value: '180000'}
