@@ -1,11 +1,11 @@
 package no.novari.ebevis.kafka;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
 import no.fint.altinn.model.AltinnApplication;
 import no.fint.altinn.model.AltinnApplicationStatus;
 import no.fint.altinn.model.kafka.KafkaEvidenceConsentAccepted;
 import no.novari.ebevis.repository.AltinnApplicationRepository;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -41,7 +41,7 @@ public class ConsentAcceptedProducer {
                     if (ex != null) {
                         log.error("Failed to publish to topic={}, key={}", topicName, key, ex);
                     } else if (result != null && result.getRecordMetadata() != null) {
-                        var meta = result.getRecordMetadata();
+                        RecordMetadata meta = result.getRecordMetadata();
                         log.info("Published consent accepted to topic={}, partition={}, offset={}, key={}", meta.topic(), meta.partition(), meta.offset(), key);
                     } else {
                         log.info("Published consent accepted to topic={}, key={}, (no metadata)", topicName, key);
