@@ -1,6 +1,7 @@
 package no.novari.ebevis.kafka;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import no.fint.altinn.model.AltinnApplication;
 import no.fint.altinn.model.AltinnApplicationStatus;
 import no.fint.altinn.model.kafka.KafkaEvidenceConsentAccepted;
@@ -68,6 +69,7 @@ public class ConsentAcceptedProducer {
 
         KafkaEvidenceConsentAccepted consentAccepted = KafkaEvidenceConsentAccepted.builder()
                 .altinnInstanceId(application.getInstanceId())
+                .altinnAppId(application.getAppId())
                 .organizationNumber(application.getSubject())
                 .organizationName(application.getSubjectName())
                 .countyOrganizationNumber(application.getRequestor())
