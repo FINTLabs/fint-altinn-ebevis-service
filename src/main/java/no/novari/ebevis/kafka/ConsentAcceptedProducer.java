@@ -54,7 +54,7 @@ public class ConsentAcceptedProducer {
                 .filter(application -> {
                     boolean isDrosjesentral = !application.getArchiveReference().startsWith("AR");
                     if (!isDrosjesentral) {
-                        log.info("Application {} is a drosjeløyvesøknad and will not be sent to FLYT.", application.getArchiveReference());
+                        log.info("Application {} is a original Altinn II drosjeløyvesøknad and will not be sent to FLYT.", application.getArchiveReference());
                     }
                     return isDrosjesentral;
                 })
