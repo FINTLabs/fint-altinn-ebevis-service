@@ -51,7 +51,7 @@ dependencies {
 
     implementation 'com.itextpdf:itext7-core:9.4.0'
 
-    implementation 'com.nimbusds:nimbus-jose-jwt:10.6'
+    implementation 'com.nimbusds:nimbus-jose-jwt:10.7'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
