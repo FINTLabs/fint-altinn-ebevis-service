@@ -36,6 +36,8 @@ dependencyManagement {
 		dependency 'org.mongodb:mongodb-driver-core:5.1.4'
 		dependency 'org.mongodb:bson:5.1.4'
 		dependency 'org.springframework.data:spring-data-mongodb:4.3.10'
+
+		dependency 'at.yawk.lz4:lz4-java:1.10.4'
 	}
 }
 
@@ -61,10 +63,16 @@ dependencies {
 	}
 
 	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.spockframework:spock-spring:2.4-M6-groovy-4.0'
-	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring3x:4.22.0'
+	testImplementation 'org.spockframework:spock-spring:2.4-groovy-4.0'
+
+	testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring3x:4.24.0")
+	// Fix CVE-2025-48924 (de.flapdoodle.embed) and friends
+	testImplementation("org.apache.commons:commons-lang3:3.18.0")
+	implementation("com.fasterxml.jackson.core:jackson-core:2.21.1")
+
 	testImplementation 'com.squareup.okhttp3:mockwebserver:5.3.2'
 	testImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
+	testImplementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.0'
 }
 
 apply from: 'https://raw.githubusercontent.com/FINTLabs/fint-buildscripts/master/reposilite.gradle'
