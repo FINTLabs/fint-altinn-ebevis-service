@@ -47,7 +47,7 @@ dependencies {
 
     implementation('io.micrometer:micrometer-registry-prometheus')
 
-    implementation 'no.fint:fint-altinn-model:3.0.0-rc-8'
+    implementation 'no.fint:fint-altinn-model:3.0.1'
 
     implementation 'com.itextpdf:itext7-core:9.4.0'
 
