@@ -30,6 +30,7 @@ public class ConsentRequestConsumer {
 
         AltinnApplication application = new AltinnApplication();
         application.setArchiveReference(evidenceRequest.getAltinnInstanceId().replace("/", "-"));
+        application.setAppId(evidenceRequest.getAltinnAppId());
         application.setInstanceId(evidenceRequest.getAltinnInstanceId());
         application.setRequestor(evidenceRequest.getCountyOrganizationNumber());
         application.setSubject(evidenceRequest.getOrganizationNumber());

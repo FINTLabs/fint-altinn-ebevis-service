@@ -5,6 +5,7 @@ import no.fint.altinn.model.AltinnApplication;
 import no.fint.altinn.model.AltinnApplicationStatus;
 import no.fint.altinn.model.kafka.KafkaEvidenceConsentAccepted;
 import no.novari.ebevis.repository.AltinnApplicationRepository;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -40,7 +41,7 @@ public class ConsentAcceptedProducer {
                     if (ex != null) {
                         log.error("Failed to publish to topic={}, key={}", topicName, key, ex);
                     } else if (result != null && result.getRecordMetadata() != null) {
-                        var meta = result.getRecordMetadata();
+                        RecordMetadata meta = result.getRecordMetadata();
                         log.info("Published consent accepted to topic={}, partition={}, offset={}, key={}", meta.topic(), meta.partition(), meta.offset(), key);
                     } else {
                         log.info("Published consent accepted to topic={}, key={}, (no metadata)", topicName, key);
@@ -53,7 +54,7 @@ public class ConsentAcceptedProducer {
                 .filter(application -> {
                     boolean isDrosjesentral = !application.getArchiveReference().startsWith("AR");
                     if (!isDrosjesentral) {
-                        log.info("Application {} is a drosjeløyvesøknad and will not be sent to FLYT.", application.getArchiveReference());
+                        log.info("Application {} is a original Altinn II drosjeløyvesøknad and will not be sent to FLYT.", application.getArchiveReference());
                     }
                     return isDrosjesentral;
                 })
@@ -68,6 +69,7 @@ public class ConsentAcceptedProducer {
 
         KafkaEvidenceConsentAccepted consentAccepted = KafkaEvidenceConsentAccepted.builder()
                 .altinnInstanceId(application.getInstanceId())
+                .altinnAppId(application.getAppId())
                 .organizationNumber(application.getSubject())
                 .organizationName(application.getSubjectName())
                 .countyOrganizationNumber(application.getRequestor())
