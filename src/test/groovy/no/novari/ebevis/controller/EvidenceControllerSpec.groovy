@@ -1,7 +1,7 @@
 package no.novari.ebevis.controller
 
-import no.fint.altinn.model.ebevis.ErrorCode
-import no.fint.altinn.model.ebevis.Evidence
+import no.novari.fint.altinn.model.ebevis.ErrorCode
+import no.novari.fint.altinn.model.ebevis.Evidence
 import no.novari.ebevis.client.DataAltinnClient
 import no.novari.ebevis.exception.AltinnException
 import no.novari.ebevis.repository.AltinnApplicationRepository

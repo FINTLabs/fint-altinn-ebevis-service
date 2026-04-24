@@ -1,7 +1,7 @@
 package no.novari.ebevis.repository;
 
-import no.fint.altinn.model.AltinnApplication;
-import no.fint.altinn.model.AltinnApplicationStatus;
+import no.novari.fint.altinn.model.AltinnApplication;
+import no.novari.fint.altinn.model.AltinnApplicationStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

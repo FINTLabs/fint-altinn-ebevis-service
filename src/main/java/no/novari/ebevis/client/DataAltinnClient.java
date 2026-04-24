@@ -1,6 +1,6 @@
 package no.novari.ebevis.client;
 
-import no.fint.altinn.model.ebevis.*;
+import no.novari.fint.altinn.model.ebevis.*;
 import no.novari.ebevis.maskinporten.MaskinportenService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;

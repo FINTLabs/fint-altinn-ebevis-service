@@ -1,7 +1,7 @@
 package no.novari.ebevis.service
 
-import no.fint.altinn.model.AltinnApplication
-import no.fint.altinn.model.AltinnApplicationStatus
+import no.novari.fint.altinn.model.AltinnApplication
+import no.novari.fint.altinn.model.AltinnApplicationStatus
 import no.novari.ebevis.configuration.MongoConfiguration
 import no.novari.ebevis.repository.AltinnApplicationRepository
 import no.novari.ebevis.service.ExpiredService

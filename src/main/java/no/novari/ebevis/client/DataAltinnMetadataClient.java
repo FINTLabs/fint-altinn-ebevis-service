@@ -1,8 +1,8 @@
 package no.novari.ebevis.client;
 
-import no.fint.altinn.model.ebevis.ErrorCode;
-import no.fint.altinn.model.ebevis.EvidenceCode;
-import no.fint.altinn.model.ebevis.EvidenceStatusCode;
+import no.novari.fint.altinn.model.ebevis.ErrorCode;
+import no.novari.fint.altinn.model.ebevis.EvidenceCode;
+import no.novari.fint.altinn.model.ebevis.EvidenceStatusCode;
 import no.novari.ebevis.configuration.AltinnProperties;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;

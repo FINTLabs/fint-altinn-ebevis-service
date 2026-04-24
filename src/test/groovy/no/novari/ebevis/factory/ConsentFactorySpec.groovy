@@ -1,6 +1,6 @@
 package no.novari.ebevis.factory
 
-import no.fint.altinn.model.AltinnApplication
+import no.novari.fint.altinn.model.AltinnApplication
 import no.novari.ebevis.factory.ConsentFactory
 import spock.lang.Specification
 

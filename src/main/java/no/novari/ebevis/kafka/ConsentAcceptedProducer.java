@@ -1,9 +1,9 @@
 package no.novari.ebevis.kafka;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.altinn.model.AltinnApplication;
-import no.fint.altinn.model.AltinnApplicationStatus;
-import no.fint.altinn.model.kafka.KafkaEvidenceConsentAccepted;
+import no.novari.fint.altinn.model.AltinnApplication;
+import no.novari.fint.altinn.model.AltinnApplicationStatus;
+import no.novari.fint.altinn.model.kafka.KafkaEvidenceConsentAccepted;
 import no.novari.ebevis.repository.AltinnApplicationRepository;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.kafka.core.KafkaTemplate;

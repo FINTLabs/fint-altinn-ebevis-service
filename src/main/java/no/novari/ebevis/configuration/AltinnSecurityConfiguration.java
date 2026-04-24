@@ -1,6 +1,6 @@
 package no.novari.ebevis.configuration;
 
-import no.fint.altinn.model.ebevis.ErrorCode;
+import no.novari.fint.altinn.model.ebevis.ErrorCode;
 import no.novari.ebevis.exception.AltinnException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

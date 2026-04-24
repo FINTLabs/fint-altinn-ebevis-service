@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import no.fint.altinn.model.ebevis.Accreditation
-import no.fint.altinn.model.ebevis.Evidence
+import no.novari.fint.altinn.model.ebevis.Accreditation
+import no.novari.fint.altinn.model.ebevis.Evidence
 import no.novari.ebevis.maskinporten.MaskinportenService
 import no.novari.ebevis.util.MediaTypeSerializer
 import no.novari.ebevis.util.ObjectFactory

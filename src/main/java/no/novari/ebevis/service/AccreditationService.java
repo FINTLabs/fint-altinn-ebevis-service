@@ -1,11 +1,11 @@
 package no.novari.ebevis.service;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.altinn.model.AltinnApplication;
-import no.fint.altinn.model.AltinnApplicationStatus;
-import no.fint.altinn.model.ConsentStatus;
-import no.fint.altinn.model.ebevis.Authorization;
-import no.fint.altinn.model.ebevis.ErrorCode;
+import no.novari.fint.altinn.model.AltinnApplication;
+import no.novari.fint.altinn.model.AltinnApplicationStatus;
+import no.novari.fint.altinn.model.ConsentStatus;
+import no.novari.fint.altinn.model.ebevis.Authorization;
+import no.novari.fint.altinn.model.ebevis.ErrorCode;
 import no.novari.ebevis.client.DataAltinnClient;
 import no.novari.ebevis.exception.AltinnException;
 import no.novari.ebevis.factory.ConsentFactory;

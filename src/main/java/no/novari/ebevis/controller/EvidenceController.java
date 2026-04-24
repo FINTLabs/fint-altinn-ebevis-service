@@ -2,10 +2,10 @@ package no.novari.ebevis.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import no.fint.altinn.model.AltinnApplication;
-import no.fint.altinn.model.ebevis.ErrorCode;
-import no.fint.altinn.model.ebevis.Evidence;
-import no.fint.altinn.model.ebevis.EvidenceStatus;
+import no.novari.fint.altinn.model.AltinnApplication;
+import no.novari.fint.altinn.model.ebevis.ErrorCode;
+import no.novari.fint.altinn.model.ebevis.Evidence;
+import no.novari.fint.altinn.model.ebevis.EvidenceStatus;
 import no.novari.ebevis.client.DataAltinnClient;
 import no.novari.ebevis.exception.AltinnException;
 import no.novari.ebevis.repository.AltinnApplicationRepository;

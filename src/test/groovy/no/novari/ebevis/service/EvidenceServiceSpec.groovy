@@ -1,12 +1,12 @@
 package no.novari.ebevis.service
 
-import no.fint.altinn.model.AltinnApplication
-import no.fint.altinn.model.AltinnApplicationStatus
-import no.fint.altinn.model.ConsentStatus
-import no.fint.altinn.model.ebevis.Accreditation
-import no.fint.altinn.model.ebevis.ErrorCode
-import no.fint.altinn.model.ebevis.EvidenceStatus
-import no.fint.altinn.model.ebevis.EvidenceStatusCode
+import no.novari.fint.altinn.model.AltinnApplication
+import no.novari.fint.altinn.model.AltinnApplicationStatus
+import no.novari.fint.altinn.model.ConsentStatus
+import no.novari.fint.altinn.model.ebevis.Accreditation
+import no.novari.fint.altinn.model.ebevis.ErrorCode
+import no.novari.fint.altinn.model.ebevis.EvidenceStatus
+import no.novari.fint.altinn.model.ebevis.EvidenceStatusCode
 import no.novari.ebevis.client.DataAltinnClient
 import no.novari.ebevis.configuration.MongoConfiguration
 import no.novari.ebevis.exception.AltinnException
