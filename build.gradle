@@ -37,7 +37,7 @@ dependencyManagement {
 		dependency 'org.mongodb:bson:5.1.4'
 		dependency 'org.springframework.data:spring-data-mongodb:4.3.10'
 
-		dependency 'at.yawk.lz4:lz4-java:1.10.4'
+		dependency 'at.yawk.lz4:lz4-java:1.11.0'
 	}
 }
 
