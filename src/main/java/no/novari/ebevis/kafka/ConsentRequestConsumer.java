@@ -23,16 +23,18 @@ public class ConsentRequestConsumer {
     @KafkaListener(topics = "#{@kafkaTopicNameProperties.getConsentRequestTopicsArray()}", groupId = "${spring.kafka.consumer.group-id}")
     public void consume(KafkaEvidenceConsentRequest evidenceRequest) {
 
-        log.info("Received a new consent request with altinnInstanceId {} and organizationNumber {}, orgId {}",
+        log.info("Received a new consent request with altinnInstanceId {}, organizationNumber {}, orgId {}, in county {}",
                 evidenceRequest.getAltinnInstanceId(),
                 evidenceRequest.getOrganizationNumber(),
-                evidenceRequest.getFintOrgId());
+                evidenceRequest.getFintOrgId(),
+                evidenceRequest.getCountyOrganizationName());
 
         AltinnApplication application = new AltinnApplication();
         application.setArchiveReference(evidenceRequest.getAltinnInstanceId().replace("/", "-"));
         application.setAppId(evidenceRequest.getAltinnAppId());
         application.setInstanceId(evidenceRequest.getAltinnInstanceId());
         application.setRequestor(evidenceRequest.getCountyOrganizationNumber());
+        application.setRequestorName(evidenceRequest.getCountyOrganizationName());
         application.setSubject(evidenceRequest.getOrganizationNumber());
         application.setSubjectName(evidenceRequest.getOrganizationName());
         application.setStatus(AltinnApplicationStatus.NEW);
