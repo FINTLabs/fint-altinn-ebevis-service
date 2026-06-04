@@ -18,7 +18,15 @@ spec:
     - {name: fint.kafka.topic.orgs.2, value: 'mrfylke-no' }
     - {name: fint.kafka.topic.orgs.3, value: 'trondelagfylke-no' }
     - {name: fint.kafka.topic.orgs.4, value: 'agderfk-no' }
-
+    - {name: fint.kafka.topic.orgs.5, value: 'afk-no' }
+    - {name: fint.kafka.topic.orgs.6, value: 'bym-oslo-kommune-no' }
+    - {name: fint.kafka.topic.orgs.7, value: 'ffk-no' }
+    - {name: fint.kafka.topic.orgs.8, value: 'innlandet-no' }
+    - {name: fint.kafka.topic.orgs.9, value: 'rogfk-no' }
+    - {name: fint.kafka.topic.orgs.10, value: 'telemarkfylke-no' }
+    - {name: fint.kafka.topic.orgs.11, value: 'tromsfylke-no' }
+    - {name: fint.kafka.topic.orgs.12, value: 'vestfoldfylke-no' }
+    - {name: fint.kafka.topic.orgs.13, value: 'vlfk-no' }
 
     - {name: scheduling.initial-delay, value: '30000'}
     - {name: scheduling.fixed-delay, value: '180000'}
