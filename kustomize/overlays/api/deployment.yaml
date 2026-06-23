@@ -21,7 +21,7 @@ spec:
     - {name: fint.kafka.topic.orgs.5, value: 'afk-no' }
     - {name: fint.kafka.topic.orgs.6, value: 'bym-oslo-kommune-no' }
     - {name: fint.kafka.topic.orgs.7, value: 'ffk-no' }
-    - {name: fint.kafka.topic.orgs.8, value: 'innlandet-no' }
+    - {name: fint.kafka.topic.orgs.8, value: 'innlandetfylke-no' }
     - {name: fint.kafka.topic.orgs.9, value: 'rogfk-no' }
     - {name: fint.kafka.topic.orgs.10, value: 'telemarkfylke-no' }
     - {name: fint.kafka.topic.orgs.11, value: 'tromsfylke-no' }
