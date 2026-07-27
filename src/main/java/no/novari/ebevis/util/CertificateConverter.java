@@ -1,5 +1,7 @@
 package no.novari.ebevis.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFont;
@@ -49,6 +51,7 @@ public class CertificateConverter {
     private static final String TAX_TITLE = "Skatteattest";
     private static final String BANKRUPT_TITLE = "Bekreftelse fra Konkursregisteret";
     private static final String MISSING_OR_FAULTY_DATA = "<Feil eller mangler i mottatte data>";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Value("${fint.font:classpath:times.ttf}")
     @Setter
@@ -237,6 +240,14 @@ public class CertificateConverter {
         } else if (evidenceCodeName.equals("RestanserDrosje")) {
             document.add(new Paragraph(String.format("Kilde: %s %s", getSource(values.get("skattForfaltOgUbetalt")), getDate(values.get("skattForfaltOgUbetalt")))));
         } else if (evidenceCodeName.equals("RestanserV2")) {
+            EvidenceValue defaultValue = values.get("default");
+
+            if (defaultValue != null) {
+                document.add(new Paragraph(String.format("Kilde: %s %s", getSource(defaultValue), getDate(defaultValue))));
+                addRestanserV2Values(defaultValue, document);
+                return;
+            }
+
             document.add(new Paragraph(String.format("Kilde: %s %s", getSource(values.get("levert")), getDate(values.get("levert")))));
         }
 
@@ -244,6 +255,65 @@ public class CertificateConverter {
                 .sorted(Map.Entry.comparingByKey())
                 .filter(entry -> evidenceValueMapping.containsKey(entry.getKey()))
                 .forEach(entry -> document.add(new Paragraph(String.format("%s: %s", evidenceValueMapping.get(entry.getKey()), getValue(entry.getValue())))));
+    }
+
+    private void addRestanserV2Values(EvidenceValue defaultEvidenceValue, Document document) {
+        JsonNode root = getJsonNode(defaultEvidenceValue);
+
+        if (root == null) {
+            log.warn("Unable to parse RestanserV2 default payload. Writing fallback values to certificate.");
+            addFallbackRestanserV2Value("arbeidsgiveravgiftForfaltOgUbetalt", document);
+            addFallbackRestanserV2Value("forskuddstrekkForfaltOgUbetalt", document);
+            addFallbackRestanserV2Value("forskuddsskattForfaltOgUbetalt", document);
+            addFallbackRestanserV2Value("restskattForfaltOgUbetalt", document);
+            addFallbackRestanserV2Value("gebyrForfaltOgUbetalt", document);
+            addFallbackRestanserV2Value("merverdiavgiftForfaltOgUbetalt", document);
+            return;
+        }
+
+        addRestanserV2Value("arbeidsgiveravgiftForfaltOgUbetalt", root.at("/restanser/arbeidsgiveravgift/forfaltOgUbetalt"), document);
+        addRestanserV2Value("forskuddstrekkForfaltOgUbetalt", root.at("/restanser/forskuddstrekk/forfaltOgUbetalt"), document);
+        addRestanserV2Value("forskuddsskattForfaltOgUbetalt", root.at("/restanser/forskuddsskatt/forfaltOgUbetalt"), document);
+        addRestanserV2Value("restskattForfaltOgUbetalt", root.at("/restanser/restskatt/forfaltOgUbetalt"), document);
+        addRestanserV2Value("gebyrForfaltOgUbetalt", root.at("/restanser/gebyr/forfaltOgUbetalt"), document);
+        addRestanserV2Value("merverdiavgiftForfaltOgUbetalt", root.at("/restanser/merverdiavgift/forfaltOgUbetalt"), document);
+    }
+
+    private void addRestanserV2Value(String evidenceValueKey, JsonNode valueNode, Document document) {
+        String evidenceLabel = evidenceValueMapping.getOrDefault(evidenceValueKey, evidenceValueKey);
+
+        if (valueNode == null || valueNode.isMissingNode() || valueNode.isNull()) {
+            log.warn("Missing RestanserV2 JSON field for key={}. Using fallback text.", evidenceValueKey);
+            document.add(new Paragraph(String.format("%s: %s", evidenceLabel, MISSING_OR_FAULTY_DATA)));
+            return;
+        }
+
+        document.add(new Paragraph(String.format("%s: %s", evidenceLabel, valueNode.asText())));
+    }
+
+    private void addFallbackRestanserV2Value(String evidenceValueKey, Document document) {
+        String evidenceLabel = evidenceValueMapping.getOrDefault(evidenceValueKey, evidenceValueKey);
+        document.add(new Paragraph(String.format("%s: %s", evidenceLabel, MISSING_OR_FAULTY_DATA)));
+    }
+
+    private JsonNode getJsonNode(EvidenceValue evidenceValue) {
+        if (evidenceValue == null || evidenceValue.getValue() == null) {
+            log.warn("RestanserV2 default evidence value was null or missing payload.");
+            return null;
+        }
+
+        Object value = evidenceValue.getValue();
+
+        try {
+            if (value instanceof String stringValue) {
+                return OBJECT_MAPPER.readTree(stringValue);
+            }
+
+            return OBJECT_MAPPER.valueToTree(value);
+        } catch (Exception e) {
+            log.error("Failed to parse RestanserV2 default payload. payloadType={}", value.getClass().getName(), e);
+            return null;
+        }
     }
 
     private String getValue(EvidenceValue evidenceValue) {

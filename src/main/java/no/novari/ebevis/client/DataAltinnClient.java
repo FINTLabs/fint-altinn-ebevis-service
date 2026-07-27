@@ -1,5 +1,7 @@
 package no.novari.ebevis.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.novari.fint.altinn.model.ebevis.*;
 import no.novari.ebevis.maskinporten.MaskinportenService;
@@ -16,6 +18,8 @@ import java.util.List;
 @Slf4j
 @Component
 public class DataAltinnClient {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private final WebClient webClient;
     private final MaskinportenService maskinporten;
 
@@ -91,6 +95,19 @@ public class DataAltinnClient {
                             evidenceCode,
                             statusCodeName,
                             evidenceValueCount);
+
+                    if ("RestanserV2".equals(evidenceCode)) {
+                        try {
+                            String evidenceAsJson = OBJECT_MAPPER.writeValueAsString(evidence);
+                            log.debug("RestanserV2 JSON: {}", evidenceAsJson);
+                        } catch (JsonProcessingException e) {
+                            log.warn("Unable to serialize Altinn evidence response to JSON, accreditationId={}, evidenceCode={}",
+                                    accreditationId,
+                                    evidenceCode,
+                                    e);
+                        }
+                    }
+
                     log.debug("Raw Altinn evidence response for accreditationId={}, evidenceCode={}: {}",
                             accreditationId,
                             evidenceCode,
