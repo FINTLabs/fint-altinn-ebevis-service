@@ -18,14 +18,14 @@ import java.util.List;
 @Slf4j
 @Component
 public class DataAltinnClient {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
     private final WebClient webClient;
     private final MaskinportenService maskinporten;
+    private final ObjectMapper objectMapper;
 
-    public DataAltinnClient(WebClient webClient, MaskinportenService maskinporten) {
+    public DataAltinnClient(WebClient webClient, MaskinportenService maskinporten, ObjectMapper objectMapper) {
         this.webClient = webClient;
         this.maskinporten = maskinporten;
+        this.objectMapper = objectMapper;
     }
 
     public Mono<Accreditation> createAccreditation(Authorization authorization) {
@@ -98,7 +98,7 @@ public class DataAltinnClient {
 
                     if ("RestanserV2".equals(evidenceCode)) {
                         try {
-                            String evidenceAsJson = OBJECT_MAPPER.writeValueAsString(evidence);
+                            String evidenceAsJson = objectMapper.writeValueAsString(evidence);
                             log.debug("RestanserV2 JSON: {}", evidenceAsJson);
                         } catch (JsonProcessingException e) {
                             log.warn("Unable to serialize Altinn evidence response to JSON, accreditationId={}, evidenceCode={}",
