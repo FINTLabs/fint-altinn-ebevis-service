@@ -70,11 +70,18 @@ public class CertificateConverter {
     }
 
     public byte[] convertCertificate(Evidence evidence, AltinnApplication application, String evidenceCodeName) {
+        log.info("Converting certificate, evidenceCodeName={}, subject={}, hasEvidence={}",
+                evidenceCodeName,
+                application == null ? null : application.getSubject(),
+                evidence != null);
+
         if (evidenceCodeName.equals("KonkursDrosje")) {
             return convertBankruptCertificate(evidence, application);
         } else if (evidenceCodeName.contains("RestanserV2")) {
             return convertTaxCertificate(evidence, application);
         }
+
+        log.warn("No converter matched evidenceCodeName={}", evidenceCodeName);
         return null;
     }
 
@@ -195,6 +202,7 @@ public class CertificateConverter {
 
     private void addEvidence(Evidence evidence, Document document) {
         if (evidence == null) {
+            log.warn("Evidence is null while creating certificate. Using fallback text: {}", MISSING_OR_FAULTY_DATA);
             document.add(new Paragraph(MISSING_OR_FAULTY_DATA));
             return;
         }
@@ -203,6 +211,10 @@ public class CertificateConverter {
         EvidenceStatus evidenceStatus = evidence.getEvidenceStatus();
 
         if (evidenceValues == null || evidenceStatus == null) {
+            log.warn("Evidence had missing core fields. evidenceStatusNull={}, evidenceValuesNull={}. Using fallback text: {}",
+                    evidenceStatus == null,
+                    evidenceValues == null,
+                    MISSING_OR_FAULTY_DATA);
             document.add(new Paragraph(MISSING_OR_FAULTY_DATA));
             return;
         }
@@ -212,7 +224,13 @@ public class CertificateConverter {
 
         String evidenceCodeName = evidenceStatus.getEvidenceCodeName();
 
+        log.info("Adding evidence values to certificate, evidenceCodeName={}, evidenceValueCount={}, keys={}",
+                evidenceCodeName,
+                evidenceValues.size(),
+                values.keySet());
+
         if (evidenceCodeName == null) {
+            log.warn("Evidence status code name was null. Using fallback source text.");
             document.add(new Paragraph(String.format("Kilde: %s", MISSING_OR_FAULTY_DATA)));
         } else if (evidenceCodeName.equals("KonkursDrosje")) {
             document.add(new Paragraph(String.format("Kilde: %s %s", getSource(values.get("Organisasjonsnavn")), getDate(values.get("Organisasjonsnavn")))));
@@ -229,9 +247,18 @@ public class CertificateConverter {
     }
 
     private String getValue(EvidenceValue evidenceValue) {
+        if (evidenceValue == null) {
+            log.warn("Evidence value entry was null. Using fallback text: {}", MISSING_OR_FAULTY_DATA);
+        }
+
         return Optional.ofNullable(evidenceValue)
                 .map(value -> {
                     if (value.getValue() == null || value.getValueType() == null) {
+                        log.warn("Evidence value had missing data. name={}, valueNull={}, valueTypeNull={}. Using fallback text: {}",
+                                value.getEvidenceValueName(),
+                                value.getValue() == null,
+                                value.getValueType() == null,
+                                MISSING_OR_FAULTY_DATA);
                         return MISSING_OR_FAULTY_DATA;
                     }
 
