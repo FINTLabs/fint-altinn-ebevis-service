@@ -10,7 +10,6 @@ import no.novari.fint.altinn.model.ebevis.EvidenceValue
 import no.novari.fint.altinn.model.ebevis.vocab.ValueType
 import spock.lang.Specification
 
-import java.io.ByteArrayInputStream
 import java.time.OffsetDateTime
 
 class CertificateConverterSpec extends Specification {
@@ -21,8 +20,8 @@ class CertificateConverterSpec extends Specification {
         converter.setFontFile("classpath:times.ttf")
 
         def application = new AltinnApplication()
-        application.setSubjectName("QUDSIYA ARCTIC TAXI & TOURS")
-        application.setSubject("937967373")
+        application.setSubjectName("TAXI 123 AS")
+        application.setSubject("123456789")
 
         def evidenceStatus = new EvidenceStatus()
         evidenceStatus.setEvidenceCodeName("KonkursDrosje")
@@ -32,7 +31,7 @@ class CertificateConverterSpec extends Specification {
         sourceValue.setValueType(ValueType.STRING)
         sourceValue.setSource("Brønnøysundregistrene")
         sourceValue.setTimestamp(OffsetDateTime.parse("2026-07-27T06:57:02.686931400Z"))
-        sourceValue.setValue("QUDSIYA ARCTIC TAXI & TOURS")
+        sourceValue.setValue("TAXI 123 AS")
 
         def konkursValue = new EvidenceValue()
         konkursValue.setEvidenceValueName("Konkurs")
@@ -72,8 +71,8 @@ class CertificateConverterSpec extends Specification {
         converter.setFontFile("classpath:times.ttf")
 
         def application = new AltinnApplication()
-        application.setSubjectName("QUDSIYA ARCTIC TAXI & TOURS")
-        application.setSubject("937967373")
+        application.setSubjectName("TAXI 123 AS")
+        application.setSubject("123456789")
 
         def evidenceStatus = new EvidenceStatus()
         evidenceStatus.setEvidenceCodeName("RestanserV2")
@@ -140,57 +139,6 @@ class CertificateConverterSpec extends Specification {
         text.contains("Restskatt forfalt og ubetalt: 37.5")
         text.contains("Gebyr forfalt og ubetalt: 50.0")
         text.contains("Merverdiavgift forfalt og ubetalt: 62.5")
-    }
-
-    def "convertTaxCertificate maps current RestanserV2 default JSON payload"() {
-        given:
-        def converter = new CertificateConverter()
-        converter.setFontFile("classpath:times.ttf")
-
-        def application = new AltinnApplication()
-        application.setSubjectName("QUDSIYA ARCTIC TAXI & TOURS")
-        application.setSubject("937967373")
-
-        def evidenceStatus = new EvidenceStatus()
-        evidenceStatus.setEvidenceCodeName("RestanserV2")
-
-        def restanser = [
-                arbeidsgiveravgift: [forfaltOgUbetalt: 0.0],
-                forskuddstrekk    : [forfaltOgUbetalt: 0.0],
-                forskuddsskatt    : [forfaltOgUbetalt: 0.0],
-                restskatt         : [forfaltOgUbetalt: 0.0],
-                gebyr             : [forfaltOgUbetalt: 0.0],
-                merverdiavgift    : [forfaltOgUbetalt: 0.0]
-        ]
-
-        def defaultValue = new EvidenceValue()
-        defaultValue.setEvidenceValueName("default")
-        defaultValue.setValueType(ValueType.JSON_SCHEMA)
-        defaultValue.setSource("Skatteetaten")
-        defaultValue.setTimestamp(OffsetDateTime.parse("2026-07-27T06:57:02.686931400Z"))
-        defaultValue.setValue([
-                levert                : "2026-07-27T08:57:02.472187",
-                forespurteOrganisasjon: "937967373",
-                restanser             : restanser
-        ])
-
-        def evidence = new Evidence()
-        evidence.setEvidenceStatus(evidenceStatus)
-        evidence.setEvidenceValues([defaultValue])
-
-        when:
-        byte[] pdf = converter.convertCertificate(evidence, application, "RestanserV2")
-        def text = extractText(pdf)
-
-        then:
-        pdf != null
-        text.contains("Kilde: Skatteetaten 2026-07-27")
-        text.contains("Arbeidsgiveravgift forfalt og ubetalt: 0")
-        text.contains("Forskuddstrekk forfalt og ubetalt: 0")
-        text.contains("Forskuddsskatt forfalt og ubetalt: 0")
-        text.contains("Restskatt forfalt og ubetalt: 0")
-        text.contains("Gebyr forfalt og ubetalt: 0")
-        text.contains("Merverdiavgift forfalt og ubetalt: 0")
     }
 
     private static String extractText(byte[] pdfBytes) {

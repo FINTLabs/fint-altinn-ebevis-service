@@ -1,7 +1,6 @@
 package no.novari.ebevis.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import no.novari.fint.altinn.model.AltinnApplication;
 import no.novari.fint.altinn.model.ebevis.ErrorCode;
 import no.novari.fint.altinn.model.ebevis.Evidence;
@@ -48,24 +47,11 @@ public class EvidenceController {
                                                                           @PathVariable String instanceId,
                                                                           @PathVariable String evidenceCodeName) {
         String partyInstanceId = partyId.concat("/").concat(instanceId);
-        log.info("Received certificate request, partyId={}, instanceId={}, evidenceCodeName={}, partyInstanceId={}",
-                partyId,
-                instanceId,
-                evidenceCodeName,
-                partyInstanceId);
-
         AltinnApplication altinnaApplication = altinnApplicationRepository.findAllByInstanceId(partyInstanceId).getFirst();
-        log.info("Found Altinn application for certificate request, accreditationId={}, subject={}",
-                altinnaApplication.getAccreditationId(),
-                altinnaApplication.getSubject());
 
         return dataAltinnClient.getEvidence(altinnaApplication.getAccreditationId(), evidenceCodeName)
                             .map(evidence -> {
                                 byte[] certificate = certificateConverter.convertCertificate(evidence, altinnaApplication, evidenceCodeName);
-                                log.info("Generated certificate, accreditationId={}, evidenceCodeName={}, certificateBytes={}",
-                                        altinnaApplication.getAccreditationId(),
-                                        evidenceCodeName,
-                                        certificate == null ? 0 : certificate.length);
 
                                 HttpHeaders headers = new HttpHeaders();
                                 headers.setContentType(MediaType.APPLICATION_PDF);

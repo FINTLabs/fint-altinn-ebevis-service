@@ -1,6 +1,5 @@
 package no.novari.ebevis.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.novari.fint.altinn.model.ebevis.*;
@@ -20,12 +19,10 @@ import java.util.List;
 public class DataAltinnClient {
     private final WebClient webClient;
     private final MaskinportenService maskinporten;
-    private final ObjectMapper objectMapper;
 
     public DataAltinnClient(WebClient webClient, MaskinportenService maskinporten, ObjectMapper objectMapper) {
         this.webClient = webClient;
         this.maskinporten = maskinporten;
-        this.objectMapper = objectMapper;
     }
 
     public Mono<Accreditation> createAccreditation(Authorization authorization) {
@@ -83,7 +80,7 @@ public class DataAltinnClient {
                         .bodyToMono(Evidence.class))
                 .doOnSuccess(evidence -> {
                     if (evidence == null) {
-                        log.warn("Altinn evidence response was null, accreditationId={}, evidenceCode={}", accreditationId, evidenceCode);
+                        log.error("Altinn evidence response was null, accreditationId={}, evidenceCode={}", accreditationId, evidenceCode);
                         return;
                     }
 
@@ -96,22 +93,6 @@ public class DataAltinnClient {
                             statusCodeName,
                             evidenceValueCount);
 
-                    if ("RestanserV2".equals(evidenceCode)) {
-                        try {
-                            String evidenceAsJson = objectMapper.writeValueAsString(evidence);
-                            log.debug("RestanserV2 JSON: {}", evidenceAsJson);
-                        } catch (JsonProcessingException e) {
-                            log.warn("Unable to serialize Altinn evidence response to JSON, accreditationId={}, evidenceCode={}",
-                                    accreditationId,
-                                    evidenceCode,
-                                    e);
-                        }
-                    }
-
-                    log.debug("Raw Altinn evidence response for accreditationId={}, evidenceCode={}: {}",
-                            accreditationId,
-                            evidenceCode,
-                            evidence);
                 })
                 .doOnError(error -> log.error("Failed to fetch evidence from Altinn, accreditationId={}, evidenceCode={}",
                         accreditationId,
