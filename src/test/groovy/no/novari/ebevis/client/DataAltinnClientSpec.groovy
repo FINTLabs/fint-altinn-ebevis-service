@@ -36,7 +36,7 @@ class DataAltinnClientSpec extends Specification {
         webClient = WebClient.builder().baseUrl('http://localhost:' + mockWebServer.getPort()).build()
         MaskinportenService maskinportenService = Mock()
         maskinportenService.getBearerToken() >> Mono.just("Bearer X")
-        dataAltinnClient = new DataAltinnClient(webClient, maskinportenService)
+        dataAltinnClient = new DataAltinnClient(webClient, maskinportenService, objectMapper)
     }
 
     void cleanup() {

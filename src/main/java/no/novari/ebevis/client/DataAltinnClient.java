@@ -1,5 +1,7 @@
 package no.novari.ebevis.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import no.novari.fint.altinn.model.ebevis.*;
 import no.novari.ebevis.maskinporten.MaskinportenService;
 import org.springframework.core.ParameterizedTypeReference;
@@ -12,12 +14,13 @@ import reactor.core.publisher.Mono;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+@Slf4j
 @Component
 public class DataAltinnClient {
     private final WebClient webClient;
     private final MaskinportenService maskinporten;
 
-    public DataAltinnClient(WebClient webClient, MaskinportenService maskinporten) {
+    public DataAltinnClient(WebClient webClient, MaskinportenService maskinporten, ObjectMapper objectMapper) {
         this.webClient = webClient;
         this.maskinporten = maskinporten;
     }
@@ -68,11 +71,33 @@ public class DataAltinnClient {
     }
 
     public Mono<Evidence> getEvidence(String accreditationId, String evidenceCode) {
+        log.info("Fetching evidence from Altinn, accreditationId={}, evidenceCode={}", accreditationId, evidenceCode);
+
         return maskinporten.getBearerToken().flatMap(bearerToken -> webClient.get()
-                    .uri("/evidence/{accreditationId}/{evidenceCode}", accreditationId, evidenceCode)
-                    .header("Authorization", bearerToken)
-                    .retrieve()
-                    .bodyToMono(Evidence.class));
+                        .uri("/evidence/{accreditationId}/{evidenceCode}", accreditationId, evidenceCode)
+                        .header("Authorization", bearerToken)
+                        .retrieve()
+                        .bodyToMono(Evidence.class))
+                .doOnSuccess(evidence -> {
+                    if (evidence == null) {
+                        log.error("Altinn evidence response was null, accreditationId={}, evidenceCode={}", accreditationId, evidenceCode);
+                        return;
+                    }
+
+                    int evidenceValueCount = evidence.getEvidenceValues() == null ? 0 : evidence.getEvidenceValues().size();
+                    String statusCodeName = evidence.getEvidenceStatus() == null ? null : evidence.getEvidenceStatus().getEvidenceCodeName();
+
+                    log.info("Received Altinn evidence, accreditationId={}, evidenceCode={}, evidenceStatusCodeName={}, evidenceValueCount={}",
+                            accreditationId,
+                            evidenceCode,
+                            statusCodeName,
+                            evidenceValueCount);
+
+                })
+                .doOnError(error -> log.error("Failed to fetch evidence from Altinn, accreditationId={}, evidenceCode={}",
+                        accreditationId,
+                        evidenceCode,
+                        error));
     }
 
     public Mono<List<EvidenceStatus>> getEvidenceStatuses(String id) {

@@ -1,7 +1,6 @@
 package no.novari.ebevis.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import no.novari.fint.altinn.model.AltinnApplication;
 import no.novari.fint.altinn.model.ebevis.ErrorCode;
 import no.novari.fint.altinn.model.ebevis.Evidence;
