@@ -104,5 +104,5 @@ jobs:
         with:
           action: deploy
           manifests: ${{ steps.workspace-manifest.outputs.manifestsBundle }}
-          images: ${{ matrix.use-image-from-overlay && 'none:none' || needs.build-and-publish.outputs.tags }}
+          images: ${{ needs.build-and-publish.outputs.tags }}
           namespace: ${{ steps.namespace.outputs.name }}
