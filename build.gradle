@@ -28,7 +28,6 @@ test {
 	useJUnitPlatform()
 }
 
-
 dependencyManagement {
 	dependencies {
 		// Azure Cosmos DB server version 3.6 :-(
