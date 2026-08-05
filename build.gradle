@@ -17,15 +17,12 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	mockitoAgent
 }
 
 repositories {
 	mavenCentral()
 	maven { url "https://repo.fintlabs.no/releases" }
-}
-
-test {
-	useJUnitPlatform()
 }
 
 dependencyManagement {
@@ -72,6 +69,15 @@ dependencies {
 	testImplementation 'com.squareup.okhttp3:mockwebserver:5.3.2'
 	testImplementation 'com.squareup.okhttp3:okhttp:5.3.2'
 	testImplementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.0'
+
+	mockitoAgent('org.mockito:mockito-core') {
+		transitive = false
+	}
+}
+
+test {
+	useJUnitPlatform()
+	jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 }
 
 apply from: 'https://raw.githubusercontent.com/FINTLabs/fint-buildscripts/master/reposilite.gradle'
