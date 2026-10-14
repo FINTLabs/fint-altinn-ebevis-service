@@ -1,9 +1,9 @@
-FROM gradle:9.4.1-jdk21 AS builder
+FROM gradle:9.4.1-jdk25 AS builder
 USER root
 COPY . .
 RUN gradle --no-daemon build
 
-FROM gcr.io/distroless/java21
+FROM gcr.io/distroless/java25
 ENV JAVA_TOOL_OPTIONS=-XX:+ExitOnOutOfMemoryError
 WORKDIR /app
 COPY --from=builder /home/gradle/src/main/resources/times.ttf /app/times.ttf
