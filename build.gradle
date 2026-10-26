@@ -50,7 +50,7 @@ dependencies {
 
     implementation 'no.novari:fint-altinn-model:4.0.0'
 
-    implementation 'com.itextpdf:itext7-core:9.5.0'
+    implementation 'com.itextpdf:itext7-core:9.8.0'
 
     implementation 'com.nimbusds:nimbus-jose-jwt:10.9.1'
 
