@@ -62,6 +62,6 @@ spec:
       maxUnavailable: 0
   env:
     - { name: TZ, value: Europe/Oslo }
-    - { name: JAVA_TOOL_OPTIONS, value: '-Xmx1G -XX:+ExitOnOutOfMemoryError' }
+    - { name: JAVA_TOOL_OPTIONS, value: '-Xmx1G -XX:+ExitOnOutOfMemoryError -XX:-UseBASE64Intrinsics' }
     - { name: scheduling.initial-delay, value: '30000' }
     - { name: scheduling.fixed-delay, value: '60000' }
